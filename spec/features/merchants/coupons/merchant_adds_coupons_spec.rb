@@ -13,9 +13,9 @@ RSpec.describe 'Adding coupons', type: :feature do
 
       click_link 'Add A Coupon'
 
-      fill_in 'Name', with: "Test1"
-      fill_in 'Value', with: "25"
-      select("Percent").from("Discount Type")
+      fill_in 'coupon[name]', with: "Test1"
+      fill_in 'coupon[value]', with: "25"
+      page.select("Percent", from: "Discount type")
       click_button 'Submit'
 
       expect(current_path).to eq(dashboard_coupons_path)
@@ -29,9 +29,9 @@ RSpec.describe 'Adding coupons', type: :feature do
 
       click_link 'Add A Coupon'
 
-      fill_in 'Name', with: "Test2"
-      fill_in 'Value', with: "10"
-      select("Dollars").from("Discount Type")
+      fill_in 'coupon[name]', with: "Test2"
+      fill_in 'coupon[value]', with: "10"
+      page.select("Dollars", from: "Discount type")
       click_button 'Submit'
 
       within "#coupon-#{Coupon.last.id}" do
@@ -59,7 +59,7 @@ RSpec.describe 'Adding coupons', type: :feature do
 
       click_link 'Add A Coupon'
 
-      fill_in 'Name', with: existing_coupon.name
+      fill_in 'coupon[name]', with: existing_coupon.name
 
       click_button 'Submit'
 
