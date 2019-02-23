@@ -5,9 +5,11 @@ RSpec.describe 'When I visit the coupon index page', type: :feature do
     before :each do
       @merchant = create(:merchant)
       @coupon_1 = create(:coupon)
-      @coupon_1 = create(:percentage_coupon)
+      @coupon_2 = create(:percentage_coupon)
+      @inactive_coupon = create(:inactive_coupon)
       allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
     end
+
     it 'I see a link on my dashboard to manage my coupons that takes me to my coupons page' do
       visit dashboard_path
 
@@ -27,7 +29,7 @@ RSpec.describe 'When I visit the coupon index page', type: :feature do
 
       within "#coupon-#{@coupon_1.id}" do
         expect(page).to have_content(@coupon_1.name)
-        expect(page).to have_content("#{@coupon_1.value}%")
+        expect(page).to have_content(number_to_currency(@coupon_1.value))
         expect(page).to have_content(@coupon_1.created_at.strftime("%B, %d %Y at %I:%M %p %Z"))
         expect(page).to have_content(@coupon_1.updated_at.strftime("%B, %d %Y at %I:%M %p %Z"))
         expect(page).to have_content("Active")
@@ -35,10 +37,18 @@ RSpec.describe 'When I visit the coupon index page', type: :feature do
 
       within "#coupon-#{@coupon_2.id}" do
         expect(page).to have_content(@coupon_2.name)
-        expect(page).to have_content(number_to_currency(@coupon_2.value))
+        expect(page).to have_content("#{@coupon_2.value}%")
         expect(page).to have_content(@coupon_2.created_at.strftime("%B, %d %Y at %I:%M %p %Z"))
         expect(page).to have_content(@coupon_2.updated_at.strftime("%B, %d %Y at %I:%M %p %Z"))
         expect(page).to have_content("Active")
+      end
+
+      within "#coupon-#{@coupon_3.id}" do
+        expect(page).to have_content(@coupon_2.name)
+        expect(page).to have_content(number_to_currency(@coupon_2.value))
+        expect(page).to have_content(@coupon_2.created_at.strftime("%B, %d %Y at %I:%M %p %Z"))
+        expect(page).to have_content(@coupon_2.updated_at.strftime("%B, %d %Y at %I:%M %p %Z"))
+        expect(page).to have_content("Disabled")
       end
     end
   end
