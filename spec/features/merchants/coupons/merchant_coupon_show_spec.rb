@@ -7,7 +7,7 @@ RSpec.describe 'When I visit my coupon show page' do
       @merchant = create(:merchant)
       @unused_coupon = create(:coupon, user: @merchant)
       @inactive_coupon = create(:inactive_coupon, user: @merchant)
-      @used_coupon = create(:coupon, user: @merchant)
+      @used_coupon = create(:coupon, user: @merchant, orders: [create(:order)])
       allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
     end
 
