@@ -82,9 +82,9 @@ RSpec.describe 'When I visit my coupon show page' do
 
       expect(current_path).to eq(dashboard_coupon_path(@unused_coupon))
       expect(page).to have_content("Coupon \"#{@unused_coupon.name}\" has been disabled.")
-      expect(page).to have_content("Status: Disabled")
+      expect(page).to have_content("Current Status: Disabled")
     end
-    
+
     it 'I can enable a disabled coupon in the system' do
       visit dashboard_coupon_path(@inactive_coupon)
 
@@ -92,7 +92,7 @@ RSpec.describe 'When I visit my coupon show page' do
 
       expect(current_path).to eq(dashboard_coupon_path(@inactive_coupon))
       expect(page).to have_content("Coupon \"#{@inactive_coupon.name}\" has been enabled.")
-      expect(page).to have_content("Status: Enabled")
+      expect(page).to have_content("Current Status: Active")
     end
 
     it "I cannot access another merchant's coupons" do
