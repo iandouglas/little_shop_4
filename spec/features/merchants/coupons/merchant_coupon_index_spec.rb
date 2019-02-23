@@ -1,12 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe 'When I visit the coupon index page', type: :feature do
+  include ActionView::Helpers
+  
   context 'as a merchant' do
     before :each do
       @merchant = create(:merchant)
-      @coupon_1 = create(:coupon)
-      @coupon_2 = create(:percentage_coupon)
-      @inactive_coupon = create(:inactive_coupon)
+      @coupon_1 = create(:coupon, user: @merchant)
+      @coupon_2 = create(:percentage_coupon, user: @merchant)
+      @inactive_coupon = create(:inactive_coupon, user: @merchant)
       allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
     end
 
@@ -43,11 +45,11 @@ RSpec.describe 'When I visit the coupon index page', type: :feature do
         expect(page).to have_content("Active")
       end
 
-      within "#coupon-#{@coupon_3.id}" do
-        expect(page).to have_content(@coupon_2.name)
-        expect(page).to have_content(number_to_currency(@coupon_2.value))
-        expect(page).to have_content(@coupon_2.created_at.strftime("%B, %d %Y at %I:%M %p %Z"))
-        expect(page).to have_content(@coupon_2.updated_at.strftime("%B, %d %Y at %I:%M %p %Z"))
+      within "#coupon-#{@inactive_coupon.id}" do
+        expect(page).to have_content(@inactive_coupon.name)
+        expect(page).to have_content(number_to_currency(@inactive_coupon.value))
+        expect(page).to have_content(@inactive_coupon.created_at.strftime("%B, %d %Y at %I:%M %p %Z"))
+        expect(page).to have_content(@inactive_coupon.updated_at.strftime("%B, %d %Y at %I:%M %p %Z"))
         expect(page).to have_content("Disabled")
       end
     end

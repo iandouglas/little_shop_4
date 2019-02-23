@@ -14,15 +14,16 @@
       <% @coupons.each do |coupon| %>
         <tr id="coupon-<%= coupon.id %>">
           <td><%= coupon.name %></td>
-          <td><%= "#{coupon.value}%" if coupon.percentage %>
-          <%= number_to_currency(coupon.value) unless coupon.percentage %></td>
+          <td><%= "#{coupon.value}%" if coupon.percent %>
+          <%= number_to_currency(coupon.value) unless coupon.percent %></td>
           <td><%= coupon.created_at.strftime("%B, %d %Y at %I:%M %p %Z") %></td>
-          <td><%= coupon.updated_atstrftime("%B, %d %Y at %I:%M %p %Z") %></td>
+          <td><%= coupon.updated_at.strftime("%B, %d %Y at %I:%M %p %Z") %></td>
           <td><%= "Active" unless coupon.disabled %>
           <%= "Disabled" if coupon.disabled %></td>
         </tr>
       <% end %>
     </tbody>
   </table>
+  <%= link_to "Add A Coupon", new_dashboard_coupon_path %>
 
 </section>
