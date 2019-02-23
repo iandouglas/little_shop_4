@@ -24,6 +24,6 @@
       <% end %>
     </tbody>
   </table>
-  <%= link_to "Add A Coupon", new_dashboard_coupon_path %>
+  <%= link_to "Add A Coupon", new_dashboard_coupon_path unless @user.coupon_count >= 5 %>
 
 </section>
