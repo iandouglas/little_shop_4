@@ -20,6 +20,17 @@ RSpec.describe Coupon, type: :model do
   end
 
   describe 'instance methods' do
+    describe '.unused?' do
+      it 'returns a boolean indicating if the coupon has ever been used' do
+        unused_coupon = create(:coupon)
+        order = create(:order)
+        used_coupon = create(:coupon)
+        order.update(coupon: used_coupon)
+
+        expect(unused_coupon.unused?).to eq(true)
+        expect(used_coupon.unused?).to eq(false)
+      end
+    end
   end
 
   describe 'class methods' do
