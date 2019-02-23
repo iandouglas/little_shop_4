@@ -9,13 +9,18 @@ class Merchant::CouponsController < Merchant::BaseController
   end
 
   def create
-    @coupon = current_user.coupons.new(coupon_params)
-    if @coupon.save
-      flash[:success] = "Coupon \"#{@coupon.name}\" has been added to the system."
-      redirect_to dashboard_coupons_path
+    if current_user.coupon_count < 5
+      @coupon = current_user.coupons.new(coupon_params)
+      if @coupon.save
+        flash[:success] = "Coupon \"#{@coupon.name}\" has been added to the system."
+        redirect_to dashboard_coupons_path
+      else
+        flash[:danger] = "There are problems with the provided information."
+        render :new
+      end
     else
-      flash[:danger] = "There are problems with the provided information."
-      render :new
+      flash[:danger] = "You have met your coupon limit for the system."
+      redirect_to dashboard_coupons_path
     end
   end
 
