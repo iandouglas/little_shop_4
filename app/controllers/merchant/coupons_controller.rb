@@ -4,6 +4,13 @@ class Merchant::CouponsController < Merchant::BaseController
     @coupons = @user.coupons
   end
 
+  def show
+    @coupon = Coupon.find(params[:id])
+    unless @coupon.user == current_user
+      render file: '/public/404'
+    end
+  end
+
   def new
     @coupon = Coupon.new
   end

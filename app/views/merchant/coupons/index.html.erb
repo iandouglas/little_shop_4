@@ -13,7 +13,7 @@
     <tbody>
       <% @coupons.each do |coupon| %>
         <tr id="coupon-<%= coupon.id %>">
-          <td><%= coupon.name %></td>
+          <td><%= link_to coupon.name, dashboard_coupon_path(coupon) %></td>
           <td><%= number_to_percentage(coupon.value, precision: 0) if coupon.percent %>
           <%= number_to_currency(coupon.value) unless coupon.percent %></td>
           <td><%= coupon.created_at.strftime("%B, %d %Y at %I:%M %p %Z") %></td>
