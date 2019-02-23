@@ -26,6 +26,19 @@ RSpec.describe 'Editing coupons', type: :feature do
       expect(page).to have_select('coupon[percent]', selected: 'Percent')
     end
 
+    it 'I can update my coupons' do
+      visit edit_dashboard_coupon_path @coupon
+
+      fill_in 'coupon[name]', with: 'New Name'
+      fill_in 'coupon[value]', with: '99.5'
+      page.select('Percent', from: 'Discount type')
+
+      click_button 'Submit'
+
+      expect(page).to have_content('NEW NAME')
+      expect(page).to have_content(number_to_percentage(99.5, strip_insignificant_zeros: true))
+    end
+
     it 'I cannot update coupons with bad information' do
       visit edit_dashboard_coupon_path(@coupon)
 

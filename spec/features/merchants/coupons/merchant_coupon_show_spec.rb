@@ -54,6 +54,27 @@ RSpec.describe 'When I visit my coupon show page' do
       expect(page).to_not have_button 'Delete Coupon'
     end
 
+    it 'I can delete a coupon from the system' do
+      visit dashboard_coupon_path(@unused_coupon)
+
+      click_button 'Delete Coupon'
+
+      expect(current_path).to eq(dashboard_coupons_path)
+      expect(page).to have_content("Coupon \"#{@unused_coupon.name}\" has been deleted.")
+      expect(page).to_not have_css("#coupon-#{@unused_coupon.id}")
+    end
+
+    it 'I cannot delete a coupon from the system that has been ordered' do
+      visit dashboard_coupon_path(@unused_coupon)
+      create(:order, coupon: @unused_coupon)
+
+      click_button 'Delete Coupon'
+
+      expect(current_path).to eq(dashboard_coupons_path)
+      expect(page).to have_content("Unable to delete coupon.")
+      expect(page).to have_css("#coupon-#{@unused_coupon.id}")
+    end
+
     it "I cannot access another merchant's coupons" do
       other_merchants_coupon = create(:coupon)
 
