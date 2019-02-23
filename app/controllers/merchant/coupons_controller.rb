@@ -49,6 +49,16 @@ class Merchant::CouponsController < Merchant::BaseController
     end
   end
 
+  def destroy
+    coupon = Coupon.find(params[:id])
+    if coupon.unused? && coupon.destroy
+      flash[:danger] = "Coupon \"#{coupon.name}\" has been deleted."
+    else
+      flash[:warning] = "Unable to delete coupon."
+    end
+    redirect_to dashboard_coupons_path
+  end
+
   private
 
   def coupon_params
