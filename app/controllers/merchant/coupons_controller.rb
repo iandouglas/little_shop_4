@@ -49,6 +49,20 @@ class Merchant::CouponsController < Merchant::BaseController
     end
   end
 
+  def enable
+    coupon = Coupon.find(params[:id])
+    coupon.update(disabled: false)
+    flash[:success] = "Coupon \"#{coupon.name}\" has been enabled."
+    redirect_to dashboard_coupon_path(coupon)
+  end
+
+  def disable
+    coupon = Coupon.find(params[:id])
+    coupon.update(disabled: true)
+    flash[:warning] = "Coupon \"#{coupon.name}\" has been disabled."
+    redirect_to dashboard_coupon_path(coupon)
+  end
+
   def destroy
     coupon = Coupon.find(params[:id])
     if coupon.unused? && coupon.destroy
