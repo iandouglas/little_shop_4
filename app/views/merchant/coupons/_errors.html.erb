@@ -1,0 +1,9 @@
+<% if !@coupon.errors.empty? %>
+<div class="alert alert-danger">
+  <ul id="errors">
+    <% @coupon.errors.full_messages.each do |message| %>
+    <li><%= message %></li>
+    <% end %>
+  </ul>
+</div>
+<% end %>

@@ -48,22 +48,36 @@ RSpec.describe 'Adding coupons', type: :feature do
       click_button 'Submit'
 
       expect(page).to have_content("Name can't be blank")
-      expect(page).to have_content("Name must be at least 1 character")
+      expect(page).to have_content("Name is too short (minimum is 1 character)")
       expect(page).to have_content("Value can't be blank")
+      expect(page).to have_content("Value is not a number")
+    end
+
+    it 'I cannot create new coupons with negative values' do
+      visit dashboard_coupons_path
+
+      click_link 'Add A Coupon'
+
+      fill_in 'coupon[name]', with: "Test2"
+      fill_in 'coupon[value]', with: "-0.1"
+      page.select("Dollars", from: "Discount type")
+      click_button 'Submit'
+
       expect(page).to have_content("Value must be greater than or equal to 0")
     end
 
     it 'I cannot create new coupons with duplicate names' do
-      existing_coupon = build(:coupon)
+      existing_coupon = create(:coupon)
       visit dashboard_coupons_path
 
       click_link 'Add A Coupon'
 
       fill_in 'coupon[name]', with: existing_coupon.name
+      fill_in 'coupon[value]', with: existing_coupon.value
 
       click_button 'Submit'
 
-      expect(page).to have_content("That name has already been registered.")
+      expect(page).to have_content("Name has already been taken")
     end
 
     it 'I cannot create more than five coupons within the system' do

@@ -9,16 +9,20 @@ class Merchant::CouponsController < Merchant::BaseController
 
   def create
     @coupon = current_user.coupons.new(coupon_params)
-    @coupon.save!
-    flash[:success] = "Coupon \"#{@coupon.name}\" has been added to the system."
-    redirect_to dashboard_coupons_path
+    if @coupon.save
+      flash[:success] = "Coupon \"#{@coupon.name}\" has been added to the system."
+      redirect_to dashboard_coupons_path
+    else
+      flash[:danger] = "There are problems with the provided information."
+      render :new
+    end
   end
 
   private
 
   def coupon_params
     strong_params = params.require(:coupon).permit(:name, :value, :percent)
-    strong_params[:name] = strong_params[:name].upcase
+    strong_params[:name].upcase!
     strong_params[:percent] = strong_params[:percent] == "Percent"
     strong_params
   end
