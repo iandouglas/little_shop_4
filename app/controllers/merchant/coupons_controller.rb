@@ -15,6 +15,13 @@ class Merchant::CouponsController < Merchant::BaseController
     @coupon = Coupon.new
   end
 
+  def edit
+    @coupon = Coupon.find(params[:id])
+    unless @coupon.user == current_user
+      render file: '/public/404'
+    end
+  end
+
   def create
     if current_user.coupon_count < 5
       @coupon = current_user.coupons.new(coupon_params)
@@ -31,8 +38,15 @@ class Merchant::CouponsController < Merchant::BaseController
     end
   end
 
-  def edit
+  def update
     @coupon = Coupon.find(params[:id])
+    if @coupon.update(coupon_params)
+      flash[:success] = "Coupon \"#{@coupon.name}\" has been updated."
+      redirect_to dashboard_coupon_path(@coupon)
+    else
+      flash[:danger] = "There are problems with the provided information."
+      render :edit
+    end
   end
 
   private
