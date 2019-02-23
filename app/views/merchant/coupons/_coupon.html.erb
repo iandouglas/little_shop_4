@@ -10,7 +10,11 @@
 
 <div class="form-group">
   <%= f.label :percent, "Discount type:" %>
-  <%= f.select :percent, options_for_select(['Percent', 'Dollars']), class: 'form-control' %>
+  <% if f.object.percent %>
+    <%= f.select :percent, options_for_select(['Percent', 'Dollars'], 'Percent'), {}, class: 'form-control' %>
+  <% else %>
+    <%= f.select :percent, options_for_select(['Percent', 'Dollars'], 'Dollars'), {}, class: 'form-control' %>
+  <% end %>
 </div>
 
 <%= f.submit 'Submit', class: 'btn btn-primary' %>

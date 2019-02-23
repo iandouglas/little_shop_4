@@ -21,7 +21,7 @@ Rails.application.routes.draw do
   scope :dashboard, module: :merchant, as: :dashboard do
     get '/', to: 'users#show'
     resources :items, only: [:index, :new, :edit, :update]
-    resources :coupons, except: [:update]
+    resources :coupons
     put '/coupons/:id/disable', to: 'coupons#disable', as: :disable_coupon
     put '/coupons/:id/enable', to: 'coupons#enab;e', as: :enable_coupon
   end

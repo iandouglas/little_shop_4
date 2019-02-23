@@ -1,0 +1,4 @@
+<%= render partial: 'merchant/coupons/errors' %>
+<%= form_for @coupon, url: {controller: 'merchant/coupons', action: 'update'} do |f| %>
+<%= render partial: 'merchant/coupons/coupon', locals: {f: f} %>
+<% end %>

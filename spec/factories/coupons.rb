@@ -8,12 +8,12 @@ FactoryBot.define do
   end
 
   factory :percentage_coupon, parent: :coupon do
-    sequence(:name) { |n| "Percentage Coupon ##{n}" }
+    sequence(:name) { |n| "PERCENTAGE COUPON ##{n}" }
     percent { true }
   end
 
   factory :inactive_coupon, parent: :coupon do
-    sequence(:name) { |n| "Inactive Coupon ##{n}" }
+    sequence(:name) { |n| "INACTIVE COUPON ##{n}" }
     disabled { true }
   end
 end
