@@ -75,6 +75,26 @@ RSpec.describe 'When I visit my coupon show page' do
       expect(page).to have_css("#coupon-#{@unused_coupon.id}")
     end
 
+    it 'I can disable a coupon in the system' do
+      visit dashboard_coupon_path(@unused_coupon)
+
+      click_button 'Disable Coupon'
+
+      expect(current_path).to eq(dashboard_coupon_path(@unused_coupon))
+      expect(page).to have_content("Coupon \"#{@unused_coupon.name}\" has been disabled.")
+      expect(page).to have_content("Status: Disabled")
+    end
+    
+    it 'I can enable a disabled coupon in the system' do
+      visit dashboard_coupon_path(@inactive_coupon)
+
+      click_button 'Enable Coupon'
+
+      expect(current_path).to eq(dashboard_coupon_path(@inactive_coupon))
+      expect(page).to have_content("Coupon \"#{@inactive_coupon.name}\" has been enabled.")
+      expect(page).to have_content("Status: Enabled")
+    end
+
     it "I cannot access another merchant's coupons" do
       other_merchants_coupon = create(:coupon)
 
