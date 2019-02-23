@@ -4,6 +4,7 @@ FactoryBot.define do
     sequence(:name) { |n| "Coupon ##{n}" }
     sequence(:value) { |n| n * 1.5 }
     percent { false }
+    disabled { false }
   end
 
   factory :percentage_coupon, parent: :coupon do
