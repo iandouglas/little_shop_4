@@ -57,5 +57,13 @@ RSpec.describe 'Editing coupons', type: :feature do
 
       expect(page).to have_content("Name has already been taken")
     end
+
+    it 'I cannot manually navigate to the edit path for another merchants coupons' do
+      other_merchant_coupon = create(:coupon)
+
+      visit edit_dashboard_coupon_path(other_merchant_coupon)
+
+      expect(page).to have_content("The page you were looking for doesn't exist")
+    end
   end
 end
