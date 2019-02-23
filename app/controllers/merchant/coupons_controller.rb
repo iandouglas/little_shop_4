@@ -4,6 +4,10 @@ class Merchant::CouponsController < Merchant::BaseController
     @coupons = @user.coupons
   end
 
+  def show
+    @coupon = Coupon.find(params[:id])
+  end
+
   def new
     @coupon = Coupon.new
   end

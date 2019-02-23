@@ -21,7 +21,7 @@ Rails.application.routes.draw do
   scope :dashboard, module: :merchant, as: :dashboard do
     get '/', to: 'users#show'
     resources :items, only: [:index, :new, :edit, :update]
-    resources :coupons, only: [:index, :new, :create]
+    resources :coupons, only: [:index, :new, :create, :show, :edit]
   end
 
   namespace :merchant do

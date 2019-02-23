@@ -54,12 +54,13 @@ RSpec.describe 'When I visit my coupon show page' do
       expect(page).to_not have_button 'Delete Coupon'
     end
 
-    it "I cannot access another merchant's coupons"
-    other_merchants_coupon = create(:coupon)
+    it "I cannot access another merchant's coupons" do
+      other_merchants_coupon = create(:coupon)
 
-    visit dashboard_coupon_path(other_merchants_coupon)
+      visit dashboard_coupon_path(other_merchants_coupon)
 
-    expect(current_path).to eq(dashboard_coupons_path)
-    expect(page).to have_content("The page you were looking for doesn't exist")
+      expect(current_path).to eq(dashboard_coupons_path)
+      expect(page).to have_content("The page you were looking for doesn't exist")
+    end
   end
 end
