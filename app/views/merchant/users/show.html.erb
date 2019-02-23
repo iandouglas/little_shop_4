@@ -5,6 +5,7 @@
 
   <%= link_to 'My Items', dashboard_items_path if current_merchant? %>
   <%= link_to 'My Items', admin_merchant_items_path(@user) if current_admin? %>
+  <%= link_to 'Manage My Coupons', dashboard_coupons_path %>
 
   <div class="statistics">
 
