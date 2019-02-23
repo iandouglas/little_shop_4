@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'When I visit the coupon index page', type: :feature do
   include ActionView::Helpers
-  
+
   context 'as a merchant' do
     before :each do
       @merchant = create(:merchant)
@@ -39,7 +39,7 @@ RSpec.describe 'When I visit the coupon index page', type: :feature do
 
       within "#coupon-#{@coupon_2.id}" do
         expect(page).to have_content(@coupon_2.name)
-        expect(page).to have_content("#{@coupon_2.value}%")
+        expect(page).to have_content(number_to_percentage(@coupon_2.value, precision: 0))
         expect(page).to have_content(@coupon_2.created_at.strftime("%B, %d %Y at %I:%M %p %Z"))
         expect(page).to have_content(@coupon_2.updated_at.strftime("%B, %d %Y at %I:%M %p %Z"))
         expect(page).to have_content("Active")
