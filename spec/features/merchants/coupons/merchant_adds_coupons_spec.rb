@@ -86,10 +86,19 @@ RSpec.describe 'Adding coupons', type: :feature do
 
       expect(page).to_not have_link 'Add A Coupon'
 
-      visit new_dashboard_coupons_path
+      visit new_dashboard_coupon_path
+
+      fill_in 'coupon[name]', with: "Test1"
+      fill_in 'coupon[value]', with: "25"
+      page.select("Percent", from: "Discount type")
+
+      click_button 'Submit'
 
       expect(current_path).to eq(dashboard_coupons_path)
       expect(page).to have_content "You have met your coupon limit for the system."
+
+      expect(page).to_not have_content("TEST1")
+      expect(page).to_not have_content("25%")
     end
   end
 end
