@@ -67,6 +67,13 @@ RSpec.describe User, type: :model do
       create(:order_item, order: @order_5, item: @item_6, unit_price: 2, quantity: 1, fulfilled: true)
       create(:order_item, order: @order_2, item: @item_4, unit_price: 2, quantity: 1, fulfilled: true)
     end
+    describe '.coupon_count' do
+      it 'returns the count of coupons in the system for a merchant' do
+        expect(@merchant.coupon_count).to eq(0)
+        create_list(:coupon, 3, user: @merchant)
+        expect(@merchant.coupon_count).to eq(3)
+      end
+    end
     describe '.top_items_for_merchant(limit)' do
       it 'returns an array of the top # items sold by quantity and the quantity of each sold for a specific merchant' do
         expect(@merchant.top_items_for_merchant(5)).to eq([@item_6, @item_4, @item_3, @item_2, @item_1])

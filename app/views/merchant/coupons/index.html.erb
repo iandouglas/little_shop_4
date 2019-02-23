@@ -14,7 +14,7 @@
       <% @coupons.each do |coupon| %>
         <tr id="coupon-<%= coupon.id %>">
           <td><%= coupon.name %></td>
-          <td><%= "#{coupon.value}%" if coupon.percent %>
+          <td><%= number_to_percentage(coupon.value, precision: 0) if coupon.percent %>
           <%= number_to_currency(coupon.value) unless coupon.percent %></td>
           <td><%= coupon.created_at.strftime("%B, %d %Y at %I:%M %p %Z") %></td>
           <td><%= coupon.updated_at.strftime("%B, %d %Y at %I:%M %p %Z") %></td>
@@ -24,6 +24,6 @@
       <% end %>
     </tbody>
   </table>
-  <%= link_to "Add A Coupon", new_dashboard_coupon_path %>
+  <%= link_to "Add A Coupon", new_dashboard_coupon_path unless @user.coupon_count >= 5 %>
 
 </section>

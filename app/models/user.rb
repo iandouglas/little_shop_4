@@ -64,6 +64,9 @@ class User < ApplicationRecord
    .limit(3)
   end
 
+  def coupon_count
+    coupons.count
+  end
 
   def top_items_for_merchant(limit)
     items.joins(:order_items)

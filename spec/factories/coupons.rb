@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :coupon do
     association :user, factory: :merchant
-    sequence(:name) { |n| "Coupon ##{n}" }
+    sequence(:name) { |n| "COUPON ##{n}" }
     sequence(:value) { |n| n * 1.5 }
     percent { false }
     disabled { false }
