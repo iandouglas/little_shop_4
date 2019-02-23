@@ -36,7 +36,7 @@ RSpec.describe 'Adding coupons', type: :feature do
 
       within "#coupon-#{Coupon.last.id}" do
         expect(page).to have_content("TEST2")
-        expect(page).to have_content(number_to_currency(25))
+        expect(page).to have_content(number_to_currency(10))
         expect(page).to have_content("Active")
       end
     end
