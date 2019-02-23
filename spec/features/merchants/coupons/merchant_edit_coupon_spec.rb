@@ -15,18 +15,18 @@ RSpec.describe 'Editing coupons', type: :feature do
 
       click_link 'Edit Coupon'
 
-      expect(page).to have_content(@coupon.name)
-      expect(page).to have_content(@coupon.value)
-      expect(page).to have_select('Discount Type', selected: 'Dollars')
+      expect(find_field('coupon[name]').value).to eq(@coupon.name)
+      expect(find_field('coupon[value]').value).to eq(@coupon.value.to_s)
+      expect(page).to have_select('coupon[percent]', selected: 'Dollars')
 
       visit edit_dashboard_coupon_path(@percentage_coupon)
 
-      expect(page).to have_content(@percentage_coupon.name)
-      expect(page).to have_content(@percentage_coupon.value)
-      expect(page).to have_select('Discount Type', selected: 'Percent')
+      expect(find_field('coupon[name]').value).to eq(@percentage_coupon.name)
+      expect(find_field('coupon[value]').value).to eq(@percentage_coupon.value.to_s)
+      expect(page).to have_select('coupon[percent]', selected: 'Percent')
     end
 
-    it 'I cannot create new coupons with bad information' do
+    it 'I cannot update coupons with bad information' do
       visit edit_dashboard_coupon_path(@coupon)
 
       fill_in 'coupon[name]', with: ''
@@ -39,7 +39,7 @@ RSpec.describe 'Editing coupons', type: :feature do
       expect(page).to have_content("Value is not a number")
     end
 
-    it 'I cannot create new coupons with negative values' do
+    it 'I cannot update coupons with negative values' do
       visit edit_dashboard_coupon_path(@coupon)
 
       fill_in 'coupon[value]', with: "-0.1"
@@ -48,7 +48,7 @@ RSpec.describe 'Editing coupons', type: :feature do
       expect(page).to have_content("Value must be greater than or equal to 0")
     end
 
-    it 'I cannot create new coupons with duplicate names' do
+    it 'I cannot update coupons with duplicate names' do
       visit edit_dashboard_coupon_path(@coupon)
 
       fill_in 'coupon[name]', with: @percentage_coupon.name
