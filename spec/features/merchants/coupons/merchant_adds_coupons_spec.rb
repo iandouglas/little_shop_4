@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Adding coupons', type: :feature do
-  import ActionView::Helpers
+  include ActionView::Helpers
   context 'as a merchant' do
     before :each do
       @merchant = create(:merchant)

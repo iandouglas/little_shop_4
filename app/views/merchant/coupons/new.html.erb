@@ -1,0 +1,3 @@
+<%= form_for @coupon, url: {controller: 'merchant/coupons', action: 'create'} do |f| %>
+<%= render partial: '/merchant/coupons/coupon', locals: {f: f} %>
+<% end %>
