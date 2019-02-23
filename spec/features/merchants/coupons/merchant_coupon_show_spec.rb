@@ -59,7 +59,6 @@ RSpec.describe 'When I visit my coupon show page' do
 
       visit dashboard_coupon_path(other_merchants_coupon)
 
-      expect(current_path).to eq(dashboard_coupons_path)
       expect(page).to have_content("The page you were looking for doesn't exist")
     end
   end
