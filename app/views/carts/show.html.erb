@@ -26,7 +26,7 @@
   <div class="panel-footer">
     <div class="row">
       <div class="col-xs-12 col-md-6">
-        <% unless @items.empty? %>
+        <% unless @cart.contents.empty? %>
           <%= form_tag coupons_path, class: 'form-inline' do %>
           <div class="form-group mx-sm-3 mb-2">
             <%= text_field_tag :coupon,"", placeholder: "Coupon Code", class: 'form-control' %>
@@ -34,26 +34,26 @@
             <%= submit_tag 'Add Coupon', class: 'btn btn-primary mb-2' %>
           <% end %>
           <% if @coupon %>
-            <p class="mx-sm-3 mb-2"><strong>Current Coupon: <%= @coupon.name %></strong></p>
+            <p class="mx-sm-3 mb-2"><strong>Current Coupon:</strong> <%= @coupon.name %></p>
+            <%= button_to 'Remove Coupon', coupon_path(@coupon), method: :delete, class: 'btn btn-danger' %>
           <% end %>
         <% end %>
       </div>
       <div class="col-xs-9 col-md-6">
         <h4 class="text-right">Total: <strong> <%= number_to_currency(@cart.total) %> </strong></h4>
         <% if @coupon %>
-          <h4>Discounted Total: <%= number_to_currency(@cart.discounted_total(@coupon)) %></h4>
+          <h4 class="text-right">Discounted Total: <%= number_to_currency(@cart.discounted_total(@coupon)) %></h4>
         <% end %>
         <br>
       </div>
     </div>
-    <div>
-      <div class="col-xs-2">
-        <%= button_to "Checkout", profile_orders_path, class: "btn btn-success btn-block" if current_user && !@cart.contents.empty?%>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col- mx-sm-3 mb-4">
+    <br/>
+    <div class="row mb-4">
+      <div class="col-3 col-md-2 mx-sm-3">
         <%= button_to "Empty Cart", cart_path, class: 'btn btn-danger mb-2', method: :delete if !@cart.contents.empty?%>
+      </div>
+      <div class="col-12 col-md-8">
+        <%= button_to "Checkout", profile_orders_path, class: "btn btn-success btn-block" if current_user && !@cart.contents.empty?%>
       </div>
     </div>
   </div>

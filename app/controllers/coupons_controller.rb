@@ -15,4 +15,13 @@ class CouponsController < ApplicationController
     end
     redirect_to cart_path
   end
+
+  def destroy
+    if session[:coupon]
+      coupon = Coupon.find(session[:coupon])
+      session.delete(:coupon)
+      flash[:warning] = "Coupon \"#{coupon.name}\" has been removed."
+    end
+    redirect_to cart_path
+  end
 end

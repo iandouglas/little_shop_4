@@ -9,7 +9,7 @@ Rails.application.routes.draw do
 
   resources :orders, only: :update
 
-  resources :coupons, only: :create
+  resources :coupons, only: [:create, :destroy]
 
   get '/cart', to: 'carts#show'
   delete '/cart', to: 'carts#destroy'
