@@ -68,6 +68,10 @@ class User < ApplicationRecord
     coupons.count
   end
 
+  def redeemed_coupon?(coupon)
+    orders.find_by(coupon: coupon).instance_of?(Order)
+  end
+
   def top_items_for_merchant(limit)
     items.joins(:order_items)
          .where(order_items: { fulfilled: true })

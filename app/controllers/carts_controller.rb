@@ -5,11 +5,10 @@ class CartsController < ApplicationController
 
   def show
     flash[:primary] = "Your cart is empty." if @cart.total_count == 0
-
     if !current_user && @cart.total_count > 0
-
       flash[:danger] = %Q[You must <a href="/login">login</a> or <a href="/register">register</a> to checkout.].html_safe
     end
+    @coupon = session[:coupon] && Coupon.find(session[:coupon])
     @items = {}
     @cart.contents.each do |item, quantity|
       @items[Item.find(item)] = quantity.to_i
@@ -53,9 +52,5 @@ class CartsController < ApplicationController
     else
       @cart.clear_item(@item_id_str)
     end
-  end
-
-  def require_shopper
-    render file: 'public/404' unless current_shopper?
   end
 end

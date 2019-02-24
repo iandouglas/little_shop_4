@@ -32,6 +32,10 @@ class ApplicationController < ActionController::Base
     render file: '/public/404' unless current_registered?
   end
 
+  def require_shopper
+    render file: 'public/404' unless current_shopper?
+  end
+
   def current_registered?
     current_user && current_user.registered?
   end

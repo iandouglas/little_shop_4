@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'cart show page', type: :feature do
+  include ActionView::Helpers
   before :each do
     @merchant = create(:merchant)
     @item_1 = @merchant.items.create(name: "Thing 1", description: "It's a thing", image: "https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png", price: 5.0, quantity: 2)
@@ -42,7 +43,155 @@ RSpec.describe 'cart show page', type: :feature do
     expect(page).to have_content("Quantity: 2")
     expect(page).to have_content("Subtotal: $10.00")
     expect(page).to have_content("Total: $10")
+  end
 
+  describe 'coupons' do
+    before :each do
+      @unused_coupon = create(:coupon, user: @merchant, value: 3.0)
+      @percentage_coupon = create(:percentage_coupon, user: @merchant, value: 50.0)
+      @inactive_coupon = create(:inactive_coupon, user: @merchant)
+      @user = create(:user)
+      add_item_to_cart(@item_1)
+    end
+
+    it "An empty cart does not display a field to add a coupon" do
+      visit logout_path # Clear cart
+      visit cart_path
+
+      expect(page).to_not have_button("Add Coupon")
+    end
+
+    it 'I see a field to enter a coupon code when I view my cart' do
+      visit cart_path
+
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+
+      expect(current_path).to eq(cart_path)
+      expect(page).to have_content "Coupon \"#{@unused_coupon.name}\" has been applied."
+      expect(page).to have_content "Current Coupon: #{@unused_coupon.name}"
+    end
+
+    it 'when I add a coupon, I see a "discounted total"' do
+      visit cart_path
+
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+
+      expect(page).to have_content "Discounted Total: #{number_to_currency(@item_1.price - @unused_coupon.value)}"
+
+      fill_in 'coupon', with: @percentage_coupon.name
+      click_button 'Add Coupon'
+
+      expect(page).to have_content "Discounted Total: #{number_to_currency(@item_1.price * @percentage_coupon.value / 100)}"
+    end
+
+    it 'Coupons entered persist when viewing other pages' do
+      visit cart_path
+
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+
+      visit items_path
+      visit cart_path
+
+      expect(page).to have_content "Current Coupon: #{@unused_coupon.name}"
+      expect(page).to have_content "Discounted Total: #{number_to_currency(@item_1.price - @unused_coupon.value)}"
+    end
+
+    it 'If I enter an invalid coupon code I see a message indicating the code is invalid' do
+      visit cart_path
+
+      fill_in 'coupon', with: "#{@unused_coupon.name + "ABCDE"}"
+      click_button 'Add Coupon'
+
+      expect(current_path).to eq(cart_path)
+      expect(page).to have_content "Invalid coupon name."
+      expect(page).to_not have_content "Current Coupon: #{@unused_coupon.name}"
+      expect(page).to_not have_content "Discounted Total:"
+    end
+
+    it 'If I enter an deactivated coupon code I see a message indicating the code is invalid' do
+      visit cart_path
+
+      fill_in 'coupon', with: "#{@inactive_coupon.name}"
+      click_button 'Add Coupon'
+
+      expect(current_path).to eq(cart_path)
+      expect(page).to have_content "Invalid coupon name."
+      expect(page).to_not have_content "Current Coupon: #{@inactive_coupon.name}"
+      expect(page).to_not have_content "Discounted Total:"
+    end
+
+    it 'If I try and use a coupon I have used before, I see a message' do
+      order = @user.orders.create(coupon: @unused_coupon)
+      login_as(@user)
+
+      visit cart_path
+
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+
+      expect(page).to have_content "Coupon \"#{@unused_coupon.name}\" has already been redeemed."
+      expect(page).to_not have_content 'Current Coupon:'
+      expect(page).to_not have_content 'Discounted Total:'
+    end
+
+    it 'If I add a coupon I have used before, it is removed when logging in' do
+      create(:order, coupon: @unused_coupon, user: @user)
+
+      visit cart_path
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+      expect(page).to have_content "Current Coupon: #{@unused_coupon.name}"
+
+      login_as(@user)
+      expect(page).to have_content "Coupon \"#{@unused_coupon.name}\" has been removed. (Already redeemed)"
+
+      visit cart_path
+
+      expect(page).to_not have_content 'Current Coupon:'
+      expect(page).to_not have_content 'Discounted Total:'
+    end
+
+    it 'Coupons only apply discounts to items sold by the issuing merchant' do
+      other_merchants_item = create(:item)
+      add_item_to_cart(other_merchants_item)
+
+      visit cart_path
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+
+      expected_value = number_to_currency(@item_1.price - @unused_coupon.value + other_merchants_item.price)
+
+      expect(page).to have_content "Discounted Total: #{expected_value}"
+    end
+
+    it 'Coupons discounts cannot reduce total cost below 0' do
+      free_item = create(:item, price: 0, user: @merchant)
+      visit logout_path # reset cart
+      add_item_to_cart(free_item)
+
+      visit cart_path
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+
+      expect(page).to have_content "Discounted Total: #{number_to_currency(0)}"
+    end
+
+    it 'users can remove coupons from their cart' do
+      visit cart_path
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+      expect(page).to have_content "Current Coupon: #{@unused_coupon.name}"
+
+      click_button 'Remove Coupon'
+
+      expect(page).to have_content "Coupon \"#{@unused_coupon.name}\" has been removed."
+
+      expect(page).to_not have_content 'Current Coupon:'
+      expect(page).to_not have_content 'Discounted Total:'
+    end
   end
 
   context "as a visitor" do
@@ -251,7 +400,6 @@ RSpec.describe 'cart show page', type: :feature do
     end
     describe 'when I add items to my cart' do
       it 'and i visit my cart I can check out' do
-
         login_as(@user)
 
         visit item_path(@item_1)
