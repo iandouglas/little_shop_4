@@ -63,7 +63,7 @@ RSpec.describe 'order show page', type: :feature do
       visit profile_order_path(@order)
 
       expect(page).to have_content("Coupon Used: #{coupon.name}")
-      expect(page).to have_content("Discounted Total: #{@order.discounted_total}")
+      expect(page).to have_content("Discounted Total: #{number_to_currency(@order.discounted_total)}")
     end
 
     describe 'I can cancel pending and processing orders' do

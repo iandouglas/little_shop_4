@@ -57,17 +57,11 @@
       <div class="col-6 col-md-4 col-lg-3 offset-6 offset-md-8 offset-lg-9">
           <h5>Total quantity: <%= @order.quantity_of_items %></h5>
           <h3>Grand total: <%= number_to_currency(@order.grand_total) %></h3>
+          <% if @order.coupon %>
+            <h6>Coupon Used: <%= @order.coupon.name %></h6>
+            <h5>Discounted Total: <%= number_to_currency(@order.discounted_total) %></h5>
+          <% end %>
       </div>
     </div>
-    <% if @order.coupon %>
-      <div class="row">
-        <div class="col-12 col-md-6">
-            <h6>Coupon Used: <%= @order.coupon.name %></h6>
-        </div>
-        <div class="col-12 col-md-6">
-            <h5>Discounted Total: <%= @order.discounted_total %></h5>
-        </div>
-      </div>
-    <% end %>
   <% end %>
 </div>

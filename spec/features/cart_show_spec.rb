@@ -83,7 +83,7 @@ RSpec.describe 'cart show page', type: :feature do
       fill_in 'coupon', with: @percentage_coupon.name
       click_button 'Add Coupon'
 
-      expect(page).to have_content "Discounted Total: #{number_to_currency(@item_1.price * @percentage_coupon.value / 100)}"
+      expect(page).to have_content "Discounted Total: #{number_to_currency(@item_1.price * (100 - @percentage_coupon.value) / 100)}"
     end
 
     it 'Coupons entered persist when viewing other pages' do
