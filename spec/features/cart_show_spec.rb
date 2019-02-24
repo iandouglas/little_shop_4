@@ -78,7 +78,7 @@ RSpec.describe 'cart show page', type: :feature do
       fill_in 'coupon', with: @unused_coupon.name
       click_button 'Add Coupon'
 
-      expect(page).to have_content "Discounted Total: #{@item_1.price - @unused_coupon.value}"
+      expect(page).to have_content "Discounted Total: #{number_to_currency(@item_1.price - @unused_coupon.value)}"
 
       fill_in 'coupon', with: @percentage_coupon.name
       click_button 'Add Coupon'
@@ -96,7 +96,7 @@ RSpec.describe 'cart show page', type: :feature do
       visit cart_path
 
       expect(page).to have_content "Current Coupon: #{@unused_coupon.name}"
-      expect(page).to have_content "Discounted Total: #{@item_1.price - @unused_coupon.value}"
+      expect(page).to have_content "Discounted Total: #{number_to_currency(@item_1.price - @unused_coupon.value)}"
     end
 
     it 'If I enter an invalid coupon code I see a message indicating the code is invalid' do
