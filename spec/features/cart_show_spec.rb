@@ -138,7 +138,7 @@ RSpec.describe 'cart show page', type: :feature do
     end
 
     it 'If I add a coupon I have used before, it is removed when logging in' do
-      @user.orders.create(items: [@item_2], coupon: @unused_coupon)
+      create(:order, coupon: @unused_coupon, user: @user)
 
       visit cart_path
       fill_in 'coupon', with: @unused_coupon.name
