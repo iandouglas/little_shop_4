@@ -36,7 +36,11 @@ class Cart
       item = Item.find(item)
       if item.user_id == coupon.user_id
         if coupon.percent
-          item.price * quantity.to_i * coupon.value / 100
+          if coupon.value > 100
+            0.0
+          else
+            item.price * quantity.to_i * (100 - coupon.value) / 100
+          end
         else
           subtotal_for_item = item.price * quantity.to_i
           if subtotal_for_item > unused_value

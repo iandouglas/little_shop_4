@@ -86,14 +86,21 @@ RSpec.describe Cart do
       expect(@cart.discounted_total(@dollar_coupon)).to eq(@item_1.price + @item_2.price - @dollar_coupon.value)
     end
 
+    it 'percentage coupons of value over 100 result in a zero return value' do
+      @percentage_coupon.update(value: 100.1)
+      @cart.add_item(@item_1.id.to_s)
+
+      expect(@cart.discounted_total(@percentage_coupon)).to eq(0.0)
+    end
+
     it 'returns a discounted total for a percentage based coupon' do
       @cart.add_item(@item_1.id.to_s)
 
-      expect(@cart.discounted_total(@percentage_coupon)).to eq(@item_1.price * @percentage_coupon.value / 100)
+      expect(@cart.discounted_total(@percentage_coupon)).to eq(@item_1.price * (100 - @percentage_coupon.value) / 100)
 
       @cart.add_item(@item_2.id.to_s)
 
-      expect(@cart.discounted_total(@percentage_coupon)).to eq((@item_1.price + @item_2.price) * @percentage_coupon.value / 100)
+      expect(@cart.discounted_total(@percentage_coupon)).to eq((@item_1.price + @item_2.price) * (100 - @percentage_coupon.value) / 100)
     end
 
     it 'Only impacts items sold by the issuing merchant' do

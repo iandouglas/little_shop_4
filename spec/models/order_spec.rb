@@ -3,6 +3,9 @@ require 'rails_helper'
 RSpec.describe Order, type: :model do
   describe 'validations' do
     it {should validate_presence_of :status}
+    it {should validate_numericality_of(:discounted_total)
+        .is_greater_than_or_equal_to(0)
+    }
   end
 
   describe 'relationships' do
