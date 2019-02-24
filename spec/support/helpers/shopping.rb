@@ -3,7 +3,7 @@ module Helpers
     def add_item_to_cart(item)
       visit item_path(item)
 
-      click_link 'Add to Cart'
+      click_link 'Add to Shopping Cart'
 
       visit cart_path
     end

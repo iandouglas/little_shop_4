@@ -55,7 +55,7 @@ RSpec.describe 'cart show page', type: :feature do
     it 'I see a field to enter a coupon code when I view my cart' do
       visit cart_path
 
-      fill_in 'coupon[name]', with: @unused_coupon.name
+      fill_in 'coupon', with: @unused_coupon.name
       click_button 'Add Coupon'
 
       expect(current_path).to eq(cart_path)
@@ -66,7 +66,7 @@ RSpec.describe 'cart show page', type: :feature do
     it 'when I add a coupon, I see a "discounted total"' do
       visit cart_path
 
-      fill_in 'coupon[name]', with: @unused_coupon.name
+      fill_in 'coupon', with: @unused_coupon.name
       click_button 'Add Coupon'
 
       expect(page).to have_content "Discounted Total: #{@item_1.price - @unused_coupon.value}"
@@ -75,7 +75,7 @@ RSpec.describe 'cart show page', type: :feature do
     it 'Coupons entered persist when viewing other pages' do
       visit cart_path
 
-      fill_in 'coupon[name]', with: @unused_coupon.name
+      fill_in 'coupon', with: @unused_coupon.name
       click_button 'Add Coupon'
 
       visit items_path
@@ -88,7 +88,7 @@ RSpec.describe 'cart show page', type: :feature do
     it 'If I enter an invalid coupon code I see a message indicating the code is invalid' do
       visit cart_path
 
-      fill_in 'coupon[name]', with: "#{@unused_coupon.name + "ABCDE"}"
+      fill_in 'coupon', with: "#{@unused_coupon.name + "ABCDE"}"
       click_button 'Add Coupon'
 
       expect(current_path).to eq(cart_path)
@@ -100,7 +100,7 @@ RSpec.describe 'cart show page', type: :feature do
     it 'If I enter an deactivated coupon code I see a message indicating the code is invalid' do
       visit cart_path
 
-      fill_in 'coupon[name]', with: "#{@inactive_coupon.name}"
+      fill_in 'coupon', with: "#{@inactive_coupon.name}"
       click_button 'Add Coupon'
 
       expect(current_path).to eq(cart_path)
@@ -116,7 +116,7 @@ RSpec.describe 'cart show page', type: :feature do
 
       visit cart_path
 
-      fill_in 'coupon[name]', with: @unused_coupon.name
+      fill_in 'coupon', with: @unused_coupon.name
       click_button 'Add Coupon'
 
       expect(page).to have_content "Coupon \"#{@unused_coupon.name}\" has already been redeemed."
@@ -129,7 +129,7 @@ RSpec.describe 'cart show page', type: :feature do
       add_item_to_cart(@item_1)
 
       visit cart_path
-      fill_in 'coupon[name]', with: @unused_coupon.name
+      fill_in 'coupon', with: @unused_coupon.name
       click_button 'Add Coupon'
       expect(page).to have_content "Current Coupon: #{@unused_coupon.name}"
 

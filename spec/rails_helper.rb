@@ -35,6 +35,7 @@ end
 RSpec.configure do |config|
 
   config.include Helpers::Authentication, type: :feature
+  config.include Helpers::Shopping, type: :feature
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
 

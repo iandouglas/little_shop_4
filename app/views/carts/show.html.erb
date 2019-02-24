@@ -2,19 +2,19 @@
   <div class="panel-body">
     <% @items.each do |item,quantity| %>
     <div class="row" id="item-<%= item.id %>">
-      <div class="col-xs-2"><img class="img-fluid" src=<%= item.image %> >
+      <div class="col-12 col-md-3"><img class="img-fluid" src="<%= item.image %>">
       </div>
-      <div class="col-md-4">
+      <div class="col-12 col-md-4">
         <h4 class="product-name"><strong> <%= item.name %> </strong></h4>
         <h4><small> <%= item.description %> </small></h4>
         <h4><small> <strong>Merchant: </strong><%= item.user.name %> </small></h4>
       </div>
-      <div class="col-md-3">
+      <div class="col-12 col-md-3">
         <p><strong>Price:</strong>  <%= number_to_currency(item.price)%></p>
         <p><strong>Quantity:</strong> <%= quantity %></p>
         <p><strong>Subtotal:</strong> <%= number_to_currency(item.subtotal(quantity)) %></p>
       </div>
-      <div class="col-">
+      <div class="col- col-md-2">
         <%= button_to "Remove Item", cart_path(item_id: item.id, quantity: (0)), class: 'btn btn-danger', id: 'inline-button', method: :put %>
         <%= button_to "Increase Quantity", cart_path(item_id: item.id, quantity: (quantity + 1)), class: 'btn btn-primary', method: :put if item.quantity > quantity %>
         <%= button_to "Decrease Quantity", cart_path(item_id: item.id, quantity: (quantity -1)), class: 'btn btn-primary', method: :put %>
@@ -22,21 +22,32 @@
     </div>
     <hr>
     <% end %>
-    <div class="row">
-      <div class="col-">
-        <%= button_to "Empty Cart", cart_path, class: 'btn btn-danger', method: :delete if !@cart.contents.empty?%>
-      </div>
-    </div>
   </div>
   <div class="panel-footer">
     <div class="row text-center">
-      <div class="col-xs-9">
+      <div class="col-xs-12 col-md-6">
+        <%= form_tag coupons_path, class: 'form-inline' do %>
+        <div class="form-group mx-sm-3 mb-2">
+          <%= text_field_tag :coupon,"", placeholder: "Coupon Code", class: 'form-control' %>
+        </div>
+          <%= submit_tag 'Add Coupon', class: 'btn btn-primary mb-2' %>
+        <% end %>
+        <% if @coupon %>
+          <p><strong>Current Coupon: <%= @coupon.name %></strong></p>
+        <% end %>
+      </div>
+      <div class="col-xs-9 col-md-6">
         <h4 class="text-right">Total: <strong> <%= number_to_currency(@cart.total) %> </strong></h4> <br>
       </div>
     </div>
     <div>
       <div class="col-xs-2">
         <%= button_to "Checkout", profile_orders_path, class: "btn btn-success btn-block" if current_user && !@cart.contents.empty?%>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col- mx-sm-3">
+        <%= button_to "Empty Cart", cart_path, class: 'btn btn-danger mb-2', method: :delete if !@cart.contents.empty?%>
       </div>
     </div>
   </div>
