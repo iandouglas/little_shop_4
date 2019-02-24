@@ -179,10 +179,20 @@ RSpec.describe 'cart show page', type: :feature do
       expect(page).to have_content "Discounted Total: #{number_to_currency(0)}"
     end
 
-    xit 'Users can try multiple coupons' do
+    it 'users can remove coupons from their cart' do
+      visit cart_path
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+      expect(page).to have_content "Current Coupon: #{@unused_coupon.name}"
+
+      click_button 'Remove Coupon'
+
+      expect(page).to have_content "Coupon \"#{@unused_coupon.name}\" has been removed."
+
+      expect(page).to_not have_content 'Current Coupon:'
+      expect(page).to_not have_content 'Discounted Total:'
     end
   end
-
 
   context "as a visitor" do
     it 'I don\'t see a button to checkout' do
