@@ -52,6 +52,13 @@ RSpec.describe 'cart show page', type: :feature do
       add_item_to_cart(@item_1)
     end
 
+    it "An empty cart does not display a field to add a coupon" do
+      visit logout_path # Clear cart
+      visit cart_path
+
+      expect(page).to_not have_button("Add Coupon")
+    end
+
     it 'I see a field to enter a coupon code when I view my cart' do
       visit cart_path
 
