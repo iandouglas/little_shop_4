@@ -16,6 +16,11 @@ class OrdersController < ApplicationController
       item = Item.find(item_id)
       order.order_items.create(item: item, unit_price: item.price, quantity: quantity)
     end
+    if session[:coupon]
+      coupon = Coupon.find(session[:coupon])
+      order.update(coupon: coupon, discounted_total: @cart.discounted_total(coupon))
+      session.delete(:coupon)
+    end
     @cart.contents.clear
     flash[:success] = "Your order was created!"
     redirect_to profile_orders_path

@@ -192,6 +192,23 @@ RSpec.describe 'cart show page', type: :feature do
       expect(page).to_not have_content 'Current Coupon:'
       expect(page).to_not have_content 'Discounted Total:'
     end
+
+    it 'If I checkout with a coupon in my cart it is not present in my next order' do
+      login_as(@user)
+      visit cart_path
+
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+
+      click_button 'Checkout'
+
+      add_item_to_cart(@item_2)
+
+      visit cart_path
+
+      expect(page).to_not have_content('Current Coupon:')
+      expect(page).to_not have_content('Discounted Total:')
+    end
   end
 
   context "as a visitor" do
