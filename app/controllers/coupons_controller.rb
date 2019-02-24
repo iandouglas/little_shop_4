@@ -8,7 +8,7 @@ class CouponsController < ApplicationController
         session[:coupon] = coupon.id
         flash[:success] = "Coupon \"#{coupon.name}\" has been applied."
       else
-        flash[:danger] = "Coupon \"#{coupon.name}\" has already been redeemed"
+        flash[:danger] = "Coupon \"#{coupon.name}\" has already been redeemed."
       end
     else
       flash[:warning] = "Invalid coupon name."

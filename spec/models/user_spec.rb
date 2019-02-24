@@ -83,7 +83,7 @@ RSpec.describe User, type: :model do
 
         expect(user.redeemed_coupon?(coupon)).to eq(false)
 
-        create(:order, coupon: coupon)
+        create(:order, coupon: coupon, user: user)
 
         expect(user.redeemed_coupon?(coupon)).to eq(true)
       end

@@ -110,7 +110,7 @@ RSpec.describe 'cart show page', type: :feature do
     end
 
     it 'If I try and use a coupon I have used before, I see a message' do
-      @user.orders.create(items: [@item_2], coupon: @unused_coupon)
+      order = @user.orders.create(coupon: @unused_coupon)
       login_as(@user)
       add_item_to_cart(@item_1)
 
