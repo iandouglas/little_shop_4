@@ -39,7 +39,11 @@
         <% end %>
       </div>
       <div class="col-xs-9 col-md-6">
-        <h4 class="text-right">Total: <strong> <%= number_to_currency(@cart.total) %> </strong></h4> <br>
+        <h4 class="text-right">Total: <strong> <%= number_to_currency(@cart.total) %> </strong></h4>
+        <% if @coupon %>
+          <h4>Discounted Total: <%= @cart.discounted_total(@coupon) %></h4>
+        <% end %>
+        <br>
       </div>
     </div>
     <div>

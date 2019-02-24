@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'cart show page', type: :feature do
+  include ActionView::Helpers
   before :each do
     @merchant = create(:merchant)
     @item_1 = @merchant.items.create(name: "Thing 1", description: "It's a thing", image: "https://upload.wikimedia.org/wikipedia/en/5/53/Snoopy_Peanuts.png", price: 5.0, quantity: 2)
@@ -161,13 +162,13 @@ RSpec.describe 'cart show page', type: :feature do
       fill_in 'coupon', with: @unused_coupon.name
       click_button 'Add Coupon'
 
-      expected_value = number_to_currency(@item_1 - @unused_coupon.value + other_merchants_item.price)
+      expected_value = number_to_currency(@item_1.price - @unused_coupon.value + other_merchants_item.price)
 
       expect(page).to have_content "Discounted Total: #{expected_value}"
     end
 
     it 'Coupons discounts cannot reduce total cost below 0' do
-      free_item = create(:item, value: 0, user: @merchant)
+      free_item = create(:item, price: 0, user: @merchant)
       visit logout_path # reset cart
       add_item_to_cart(free_item)
 
