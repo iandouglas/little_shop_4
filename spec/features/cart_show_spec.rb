@@ -47,6 +47,7 @@ RSpec.describe 'cart show page', type: :feature do
   describe 'coupons' do
     before :each do
       @unused_coupon = create(:coupon, user: @merchant, value: 3.0)
+      @percentage_coupon = create(:percentage_coupon, user: @merchant, value: 50.0)
       @inactive_coupon = create(:inactive_coupon, user: @merchant)
       @user = create(:user)
       add_item_to_cart(@item_1)
@@ -77,6 +78,11 @@ RSpec.describe 'cart show page', type: :feature do
       click_button 'Add Coupon'
 
       expect(page).to have_content "Discounted Total: #{@item_1.price - @unused_coupon.value}"
+
+      fill_in 'coupon', with: @percentage_coupon.name
+      click_button 'Add Coupon'
+
+      expect(page).to have_content "Discounted Total: #{number_to_currency(@item_1.price * @percentage_coupon.value / 100)}"
     end
 
     it 'Coupons entered persist when viewing other pages' do
@@ -119,7 +125,6 @@ RSpec.describe 'cart show page', type: :feature do
     it 'If I try and use a coupon I have used before, I see a message' do
       order = @user.orders.create(coupon: @unused_coupon)
       login_as(@user)
-      add_item_to_cart(@item_1)
 
       visit cart_path
 
@@ -133,7 +138,6 @@ RSpec.describe 'cart show page', type: :feature do
 
     it 'If I add a coupon I have used before, it is removed when logging in' do
       @user.orders.create(items: [@item_2], coupon: @unused_coupon)
-      add_item_to_cart(@item_1)
 
       visit cart_path
       fill_in 'coupon', with: @unused_coupon.name
@@ -148,7 +152,36 @@ RSpec.describe 'cart show page', type: :feature do
       expect(page).to_not have_content 'Current Coupon:'
       expect(page).to_not have_content 'Discounted Total:'
     end
+
+    it 'Coupons only apply discounts to items sold by the issuing merchant' do
+      other_merchants_item = create(:item)
+      add_item_to_cart(other_merchants_item)
+
+      visit cart_path
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+
+      expected_value = number_to_currency(@item_1 - @unused_coupon.value + other_merchants_item.price)
+
+      expect(page).to have_content "Discounted Total: #{expected_value}"
+    end
+
+    it 'Coupons discounts cannot reduce total cost below 0' do
+      free_item = create(:item, value: 0, user: @merchant)
+      visit logout_path # reset cart
+      add_item_to_cart(free_item)
+
+      visit cart_path
+      fill_in 'coupon', with: @unused_coupon.name
+      click_button 'Add Coupon'
+
+      expect(page).to have_content "Discounted Total: #{number_to_currency(0)}"
+    end
+
+    xit 'Users can try multiple coupons' do
+    end
   end
+
 
   context "as a visitor" do
     it 'I don\'t see a button to checkout' do
