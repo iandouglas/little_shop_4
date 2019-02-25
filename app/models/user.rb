@@ -64,6 +64,20 @@ class User < ApplicationRecord
    .limit(3)
   end
 
+  def self.total_sales
+    joins(items: :orders)
+    .where(orders: {status: 'completed'})
+    .sum('order_items.unit_price * order_items.quantity')
+  end
+
+  def self.total_sales_by_merchant
+    joins(items: :orders)
+    .select('users.*, sum(order_items.unit_price * order_items.quantity) as revenue')
+    .where(orders: {status: 'completed'})
+    .group(:id)
+    .order('revenue desc')
+  end
+
   def coupon_count
     coupons.count
   end
