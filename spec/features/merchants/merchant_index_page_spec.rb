@@ -68,11 +68,7 @@ RSpec.describe 'when I visit the merchant index page' do
 
     create(:order_item, order: @order_3, item: @item_4, unit_price: 5, quantity: 20, fulfilled: true, created_at: 4.seconds.ago, updated_at: 1.second.ago)
     create(:order_item, order: @order_3, item: @item_5, unit_price: 3, quantity: 10, fulfilled: true, created_at: 30.seconds.ago, updated_at: 29.seconds.ago)
-
-
-    end
-
-
+  end
 
   context 'as a visitor' do
     it "I see a list of all merchants in the system" do
@@ -117,6 +113,30 @@ RSpec.describe 'when I visit the merchant index page' do
   end
 
   context 'in the statistics part of the page' do
+
+    it 'I see a pie chart of all merchants who have completed orders and their revenue' do
+      within '#statistics' do
+        within '#merchants-by-revenue' do
+          expect(page).to have_css('#merchants-by-revenue-chart')
+          within "merchant-#{@merchant_1.id}" do
+            expect(page).to have_content(number_to_currency(500))
+          end
+
+          within "merchant-#{@merchant_1.id}" do
+            expect(page).to have_content(number_to_currency(100))
+          end
+
+          within "merchant-#{@merchant_1.id}" do
+            expect(page).to have_content(number_to_currency(30))
+          end
+
+          within "merchant-#{@merchant_1.id}" do
+            expect(page).to have_content(number_to_currency(30))
+          end
+        end
+      end
+    end
+
     it "I see the top 3 merchants by revenue and their revenue" do
       visit merchants_path
 
