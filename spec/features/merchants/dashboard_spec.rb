@@ -85,6 +85,17 @@ RSpec.describe 'Merchant dashboard page' do
         end
       end
 
+      it 'I see a pie chart representing my inventory sold' do
+        login_as(@merchant)
+
+        visit dashboard_path
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#inventory-chart')
+        end
+      end
+
       it 'I see a link that directs me to /dashboard/items' do
         login_as(@merchant)
 

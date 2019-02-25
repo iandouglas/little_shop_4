@@ -113,6 +113,12 @@ RSpec.describe User, type: :model do
       end
     end
 
+    describe '.current_inventory' do
+      it 'returns the current total stock for a merchant' do
+        expect(@merchant.current_inventory).to eq(60)
+      end
+    end
+
     describe '.top_states(limit)' do
       it 'returns an array of the top # states where the most items were sold by a specific merchant along with the quantity shipped to each state' do
         expect(@merchant.top_states(3).first.state).to eq('Wisconsin')

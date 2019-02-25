@@ -1,4 +1,4 @@
-<section>
+<section class="container">
   <h1 class="text-center">Your Dashboard</h1>
   <%= link_to 'Downgrade Merchant to User', admin_downgrade_merchant_path(@user), method: :put if current_admin?  %>
   <%= render partial: '/users/profile' %>
@@ -6,11 +6,8 @@
   <%= link_to 'My Items', admin_merchant_items_path(@user) if current_admin? %>
   <%= link_to 'Manage My Coupons', dashboard_coupons_path %>
   <div class="statistics">
-    <div class="progress">
-      <div class="progress-bar" role="progressbar" style="width: <%=number_to_percentage((@user.items_sold_by_percentage * 100), precision: 0) %>;" aria-valuenow=" <%=@user.items_sold_by_percentage * 100.round(2) %> " aria-valuemin="0" aria-valuemax="100"> <%=number_to_percentage((@user.items_sold_by_percentage * 100), precision: 0) %>
-      </div>
-    </div>
-    <p>Items Sold: You have sold <%= @user.items_sold_by_quantity %> items which is <%=number_to_percentage((@user.items_sold_by_percentage * 100), precision: 0) %> of your total inventory. </p>
+    <svg id="inventory-chart">
+    </svg>
     <section class="row">
       <div class="col">
         <h6 class="text-center">Top 5 Items</h6>
@@ -151,3 +148,45 @@
     </table>
   </div>
 </section>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+  var w = 300,
+  h = 300,
+  r = 100,
+  color = d3.scale.category20c();
+  var data = [{label: "Remaining Inventory", value: <%= @user.current_inventory %>},
+              {label: "Items Sold", value: <%= @user.items_sold_by_quantity %>}]
+
+  var vis = d3.select("#inventory-chart")
+      .data([data])
+          .attr("width", w)
+          .attr("height", h)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
+  var arc = d3.svg.arc()
+      .outerRadius(r);
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+</script>

@@ -148,6 +148,10 @@ class User < ApplicationRecord
          .order('year desc, month desc')
   end
 
+  def current_inventory
+    items.sum(:quantity)
+  end
+
   def self.all_merchants
     where(role: 1)
     .order(id: :asc) # Was getting unstable returns, updated for tests
