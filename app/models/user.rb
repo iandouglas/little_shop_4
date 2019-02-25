@@ -138,6 +138,16 @@ class User < ApplicationRecord
          .limit(limit)
   end
 
+  def revenue_by_month(limit)
+    items.joins(:order_items)
+         .select("SUM(order_items.unit_price * order_items.quantity) AS revenue,
+                  EXTRACT(MONTH FROM order_items.created_at) AS month,
+                  EXTRACT(YEAR FROM order_items.created_at) AS year")
+         .where("order_items.created_at > ?", limit.months.ago)
+         .group("year, month")
+         .order('year desc, month desc')
+  end
+
   def self.all_merchants
     where(role: 1)
     .order(id: :asc) # Was getting unstable returns, updated for tests
