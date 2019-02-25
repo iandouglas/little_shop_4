@@ -293,5 +293,22 @@ RSpec.describe User, type: :model do
       end
     end
 
+    describe 'total_sales_by_merchant' do
+      it "returns merchants who have been part of completed orders by total revenue" do
+        actual = User.total_sales_by_merchant
+        expect(actual).to eq ([@merchant_1, @merchant_3, @merchant_2, @merchant_4])
+        expect(actual[0].revenue).to eq(500)
+        expect(actual[1].revenue).to eq(100)
+        expect(actual[2].revenue).to eq(30)
+        expect(actual[3].revenue).to eq(30)
+      end
+    end
+
+    describe 'total_sales' do
+      it 'returns the total sales for the site (completed orders only)' do
+        expect(User.total_sales).to eq(1000)
+      end
+    end
+
   end
 end
