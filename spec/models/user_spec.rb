@@ -15,7 +15,6 @@ RSpec.describe User, type: :model do
         .only_integer
         }
 
-
     it {should validate_length_of(:name)
         .is_at_least(1)
     }
@@ -146,6 +145,40 @@ RSpec.describe User, type: :model do
       it 'returns the top 3 users who have spent the most money on a specific merchant\'s items, along with the total amount spent by each' do
         expect(@merchant.top_spenders(3).first.name).to eq(@user_1.name)
         expect(@merchant.top_spenders(3).first.total_spent).to eq(100)
+      end
+    end
+
+    describe '.revenue_by_month(limit)' do
+      it 'Returns the revenue for the past (limit) number of months' do
+        january = create_list(:order_item, 2, item: @item_1)
+        december = create_list(:order_item, 3, item: @item_1)
+        november = create_list(:order_item, 4, item: @item_1)
+        october = create_list(:order_item, 4, item: @item_1)
+        september = create_list(:order_item, 2, item: @item_1)
+        august = create_list(:order_item, 1, item: @item_1)
+        july = create_list(:order_item, 8, item: @item_1)
+
+        result = @merchant.revenue_by_month(6)
+
+        expect(result.length).to eq(6)
+        expect(result[0].revenue).to eq(2 * @item_1.price)
+        expect(result[0].month).to eq(1)
+        expect(result[0].year).to eq(2019)
+        expect(result[1].revenue).to eq(3 * @item_1.price)
+        expect(result[1].month).to eq(12)
+        expect(result[1].year).to eq(2018)
+        expect(result[2].revenue).to eq(4 * @item_1.price)
+        expect(result[2].month).to eq(11)
+        expect(result[2].year).to eq(2018)
+        expect(result[3].revenue).to eq(4 * @item_1.price)
+        expect(result[3].month).to eq(10)
+        expect(result[3].year).to eq(2018)
+        expect(result[4].revenue).to eq(2 * @item_1.price)
+        expect(result[4].month).to eq(9)
+        expect(result[4].year).to eq(2018)
+        expect(result[5].revenue).to eq(1 * @item_1.price)
+        expect(result[5].month).to eq(8)
+        expect(result[5].year).to eq(2018)
       end
     end
   end
