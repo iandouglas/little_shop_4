@@ -157,7 +157,6 @@ RSpec.describe 'when I visit the merchant index page' do
 
       within '#statistics' do
         within '#fastest-merchants' do
-          expect(page).to have_css('fastest-merchants-chart')
           fastest_merchants = page.find_all(".list-group-item")
           expect(page).to have_content("Top 3 Fastest Merchants")
           expect(fastest_merchants[0]).to have_content("#{@merchant_4.name}. Average Fulfillment Time: #{time_string("00:00:01")}")
@@ -172,7 +171,6 @@ RSpec.describe 'when I visit the merchant index page' do
 
       within '#statistics' do
         within '#slowest-merchants' do
-          expect(page).to have_css('#slowest-merchants-chart')
           slowest_merchants = page.find_all(".list-group-item")
           expect(page).to have_content("Top 3 Slowest Merchants")
           expect(slowest_merchants[0]).to have_content("#{@merchant_1.name}. Average Fulfillment Time: #{time_string("00:00:58")}")
