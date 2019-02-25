@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   before_action :require_user, only: :show
   def index
     @merchants = User.all_merchants
+    @total_sales_by_merchant = User.total_sales_by_merchant
     @top_merchants_by_revenue = User.top_merchants_by_revenue
     @fastest_merchants = User.fastest_merchants
     @slowest_merchants = User.slowest_merchants

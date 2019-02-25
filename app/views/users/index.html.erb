@@ -1,5 +1,23 @@
 <section class="container" id="statistics">
   <section id="accordian">
+    <section class="card" id="merchants-by-revenue">
+      <section class="card-header">
+        <h4 class="mb-0">
+          <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-merchants-by-revenue" aria-expanded="false" aria-controls="collapse-merchants-by-revenue">
+            Revenue for All Merchants
+          </button>
+        </h4>
+      </section>
+      <section class="collapse" id="collapse-merchants-by-revenue">
+        <svg id="merchants-by-revenue-chart">
+        </svg>
+        <ul class="list-group">
+          <% @total_sales_by_merchant.each do |merchant|%>
+          <li class="list-group-item" id="merchant-<%= merchant.id %>"> <%= merchant.name %>. Revenue: <%= number_to_currency(merchant.revenue) %> </li>
+          <% end %>
+        </ul>
+      </section>
+    </section>
     <section class="card" id="biggest-merchants">
       <section class="card-header">
         <h4 class="mb-0">
@@ -121,3 +139,46 @@
     <% end %>
   </tbody>
 </table>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+  var w = 300,
+  h = 300,
+  width = 450,
+  r = 100,
+  barHeight = 20,
+  color = d3.scale.category20c();
+  var data = <%= @total_sales_by_merchant.map {|merchant| {label: merchant.name, value: merchant.revenue}}.to_json.html_safe %>;
+
+  var vis = d3.select("#merchants-by-revenue-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")");
+
+  var arc = d3.svg.arc()
+      .outerRadius(r);
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+</script>
