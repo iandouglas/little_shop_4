@@ -2,173 +2,152 @@
   <h1 class="text-center">Your Dashboard</h1>
   <%= link_to 'Downgrade Merchant to User', admin_downgrade_merchant_path(@user), method: :put if current_admin?  %>
   <%= render partial: '/users/profile' %>
-
   <%= link_to 'My Items', dashboard_items_path if current_merchant? %>
   <%= link_to 'My Items', admin_merchant_items_path(@user) if current_admin? %>
   <%= link_to 'Manage My Coupons', dashboard_coupons_path %>
-
   <div class="statistics">
-
     <div class="progress">
       <div class="progress-bar" role="progressbar" style="width: <%=number_to_percentage((@user.items_sold_by_percentage * 100), precision: 0) %>;" aria-valuenow=" <%=@user.items_sold_by_percentage * 100.round(2) %> " aria-valuemin="0" aria-valuemax="100"> <%=number_to_percentage((@user.items_sold_by_percentage * 100), precision: 0) %>
+      </div>
     </div>
-  </div>
-
     <p>Items Sold: You have sold <%= @user.items_sold_by_quantity %> items which is <%=number_to_percentage((@user.items_sold_by_percentage * 100), precision: 0) %> of your total inventory. </p>
-
     <section class="row">
       <div class="col">
-
         <h6 class="text-center">Top 5 Items</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-               <% @user.top_items_for_merchant(5).each do |item| %>
-              <tr>
-                <td> <%= item.name %> </td>
-                <td> <%= item.total_quantity %> </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
+        <table class="table table-condensed" id="top-selling-items">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user.top_items_for_merchant(5).each do |item| %>
+            <tr>
+              <td> <%= item.name %> </td>
+              <td> <%= item.total_quantity %> </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
-
       <div class="col">
-
         <h6 class="text-center">Top 3 States</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>State</th>
-                <th>Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @user.top_states(3).each do |state| %>
-              <tr>
-                <td> <%= state.state %> </td>
-                <td> <%= state.state_quantity %> </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
+        <table class="table table-condensed" id="top-selling-items">
+          <thead>
+            <tr>
+              <th>State</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user.top_states(3).each do |state| %>
+            <tr>
+              <td> <%= state.state %> </td>
+              <td> <%= state.state_quantity %> </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
-
       <div class="col">
-
         <h6 class="text-center">Top 3 Cities</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>City</th>
-                <th>Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @user.top_cities(3).each do |city| %>
-              <tr>
-                <td> <%= city.location %> </td>
-                <td> <%= city.city_quantity %> </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
+        <table class="table table-condensed" id="top-selling-items">
+          <thead>
+            <tr>
+              <th>City</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user.top_cities(3).each do |city| %>
+            <tr>
+              <td> <%= city.location %> </td>
+              <td> <%= city.city_quantity %> </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     </section>
-
     <section class="row">
       <div class="col">
-
         <h6 class="text-center">Customer With Most Orders:</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><%= @user.top_customer_by_orders.name if @user.top_customer_by_orders %></td>
-                <td>  <%= @user.top_customer_by_orders.order_count if @user.top_customer_by_orders %> </td>
-              </tr>
-            </tbody>
-          </table>
+        <table class="table table-condensed" id="top-selling-items">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><%= @user.top_customer_by_orders.name if @user.top_customer_by_orders %></td>
+              <td>  <%= @user.top_customer_by_orders.order_count if @user.top_customer_by_orders %> </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-
       <div class="col">
-
         <h6 class="text-center">Customer with Most Items</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td> <%= @user.top_customer_by_items.name if @user.top_customer_by_items %> </td>
-                <td> <%= @user.top_customer_by_items.item_count if @user.top_customer_by_items %> </td>
-              </tr>
-            </tbody>
-          </table>
+        <table class="table table-condensed" id="top-selling-items">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td> <%= @user.top_customer_by_items.name if @user.top_customer_by_items %> </td>
+              <td> <%= @user.top_customer_by_items.item_count if @user.top_customer_by_items %> </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-
       <div class="col">
-
         <h6 class="text-center">3 Biggest Spenders</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Total spent</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @user.top_spenders(3).each do |user| %>
-              <tr>
-                <td> <%= user.name %> </td>
-                <td> <%= number_to_currency(user.total_spent) %> </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
+        <table class="table table-condensed" id="top-selling-items">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Total spent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user.top_spenders(3).each do |user| %>
+            <tr>
+              <td> <%= user.name %> </td>
+              <td> <%= number_to_currency(user.total_spent) %> </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     </section>
   </div>
-
-
-<div class="container">
-  <h6 class="text-center">Pending Orders</h6>
-
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Order ID</th>
-        <th>Placed on</th>
-        <th>Total Items</th>
-        <th>Total Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @orders.each do |order| %>
-      <tr class="order-<%= order.id %>">
-        <td><%= link_to "##{order.id}", merchant_order_path(order) if current_merchant? %>
-         <%= link_to "##{order.id}", admin_order_path(order) if current_admin? %></td>
-        <td><%= order.created_at.localtime.strftime("%m-%d-%Y") %> </td>
-        <td><%= order.total_items_for_merchant(@user) %> </td>
-        <td><%= number_to_currency(order.total_value_for_merchant(@user)) %> </td>
-      </tr>
-      <% end %>
-    </tbody>
-
-  </table>
-
-
+  <div class="container">
+    <h6 class="text-center">Pending Orders</h6>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Placed on</th>
+          <th>Total Items</th>
+          <th>Total Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @orders.each do |order| %>
+          <tr class="order-<%= order.id %>">
+            <td><%= link_to "##{order.id}", merchant_order_path(order) if current_merchant? %>
+              <%= link_to "##{order.id}", admin_order_path(order) if current_admin? %></td>
+              <td><%= order.created_at.localtime.strftime("%m-%d-%Y") %> </td>
+              <td><%= order.total_items_for_merchant(@user) %> </td>
+              <td><%= number_to_currency(order.total_value_for_merchant(@user)) %> </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 </section>
