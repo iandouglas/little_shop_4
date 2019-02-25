@@ -105,6 +105,24 @@ RSpec.describe 'admin views merchant dashboard' do
         end
       end
 
+      it 'I see a pie chart representing the merchants top 3 states' do
+        visit admin_merchant_path(@merchant)
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#top-states-chart')
+        end
+      end
+
+      it 'I see a pie chart representing the merchants top 3 cities' do
+        visit admin_merchant_path(@merchant)
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#top-cities-chart')
+        end
+      end
+
       it 'I see a bar graph representing the merchants revenue by month for the past 12 months' do
         new_merchant = create(:merchant)
         new_item = create(:item, user: new_merchant)

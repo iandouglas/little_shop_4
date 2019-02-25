@@ -6,11 +6,31 @@
   <%= link_to 'My Items', admin_merchant_items_path(@user) if current_admin? %>
   <%= link_to 'Manage My Coupons', dashboard_coupons_path %>
   <div class="statistics">
-    <svg id="inventory-chart">
-    </svg>
-    <p>You have sold <%= @user.items_sold_by_quantity %> items which is <%= number_to_percentage(@user.items_sold_by_percentage * 100, strip_insignificant_zeros: true) %> of your total inventory.</p>
-    <svg id="revenue-by-month-chart">
-    </svg>
+    <section class="row">
+      <div class="col-12 col-md-6 text-center">
+        <svg id="inventory-chart">
+        </svg>
+        <p>You have sold <%= @user.items_sold_by_quantity %> items which is <%= number_to_percentage(@user.items_sold_by_percentage * 100, strip_insignificant_zeros: true) %> of your total inventory.</p>
+      </div>
+      <div class="col-12 col-md-6 text-center">
+        <svg id="revenue-by-month-chart">
+        </svg>
+        <table class="table table-condensed">
+          <thead>
+            <th>Month</th>
+            <th>Revenue</th>
+          </thead>
+          <tbody>
+            <% @user.revenue_by_month(12).each do |month| %>
+              <tr id="month-<%= month.month %>">
+                <td><%= "#{month.month.to_i}-#{month.year.to_i}" %></td>
+                <td><%= number_to_currency(month.revenue) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
     <section class="row">
       <div class="col">
         <h6 class="text-center">Top 5 Items</h6>
@@ -31,8 +51,10 @@
           </tbody>
         </table>
       </div>
-      <div class="col">
-        <h6 class="text-center">Top 3 States</h6>
+      <div class="col text-center">
+        <h6>Top 3 States</h6>
+        <svg id="top-states-chart">
+        </svg>
         <table class="table table-condensed" id="top-selling-items">
           <thead>
             <tr>
@@ -50,8 +72,10 @@
           </tbody>
         </table>
       </div>
-      <div class="col">
-        <h6 class="text-center">Top 3 Cities</h6>
+      <div class="col text-center">
+        <h6>Top 3 Cities</h6>
+        <svg id="top-cities-chart">
+        </svg>
         <table class="table table-condensed" id="top-selling-items">
           <thead>
             <tr>
@@ -165,8 +189,8 @@
 
   var vis = d3.select("#inventory-chart")
       .data([data])
-          .attr("width", w)
-          .attr("height", h)
+          .attr("width", r * 2)
+          .attr("height", r * 2)
       .append("svg:g")
           .attr("transform", "translate(" + r + "," + r + ")")
 
@@ -222,4 +246,72 @@
           .attr("dy", ".35em")
           .attr("fill", "black")
           .text(function(d) { return d; });
+
+  var data = <%= (@user.top_states(3).map {|state| {label: state.state, value: state.state_quantity}}.to_json).html_safe %>
+
+  var vis = d3.select("#top-states-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
+  var arc = d3.svg.arc()
+      .outerRadius(r);
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= (@user.top_cities(3).map {|city| {label: city.location, value: city.city_quantity}}.to_json).html_safe %>
+
+  var vis = d3.select("#top-cities-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
+  var arc = d3.svg.arc()
+      .outerRadius(r);
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
 </script>

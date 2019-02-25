@@ -95,6 +95,29 @@ RSpec.describe 'Merchant dashboard page' do
           expect(page).to have_css('#inventory-chart')
         end
       end
+
+      it 'I see a pie chart representing my top 3 states' do
+        login_as(@merchant)
+
+        visit dashboard_path
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#top-states-chart')
+        end
+      end
+
+      it 'I see a pie chart representing my top 3 cities' do
+        login_as(@merchant)
+
+        visit dashboard_path
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#top-cities-chart')
+        end
+      end
+
       it 'I see a bar graph representing my revenue by month for the past 12 months' do
         new_merchant = create(:merchant)
         new_item = create(:item, user: new_merchant)
