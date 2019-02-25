@@ -8,6 +8,9 @@
   <div class="statistics">
     <svg id="inventory-chart">
     </svg>
+    <p>You have sold <%= @user.items_sold_by_quantity %> items which is <%= number_to_percentage(@user.items_sold_by_percentage * 100, strip_insignificant_zeros: true) %> of your total inventory.</p>
+    <svg id="revenue-by-month-chart">
+    </svg>
     <section class="row">
       <div class="col">
         <h6 class="text-center">Top 5 Items</h6>
@@ -153,10 +156,12 @@
 <script type="text/javascript">
   var w = 300,
   h = 300,
+  width = 450,
   r = 100,
+  barHeight = 20,
   color = d3.scale.category20c();
   var data = [{label: "Remaining Inventory", value: <%= @user.current_inventory %>},
-              {label: "Items Sold", value: <%= @user.items_sold_by_quantity %>}]
+              {label: "Items Sold", value: <%= @user.items_sold_by_quantity %>}];
 
   var vis = d3.select("#inventory-chart")
       .data([data])
@@ -189,4 +194,32 @@
           })
           .attr("text-anchor", "middle")
           .text(function(d, i) { return data[i].label; });
+
+  var data = <%= @user.revenue_by_month(12).map {|month| month.revenue} %>;
+
+  var x = d3.scale.linear()
+    .domain([0, d3.max(data)])
+    .range([0, width]);
+
+  var chart = d3.select('#revenue-by-month-chart')
+      .data(data)
+        .attr("width", width + 50)
+        .attr("height", barHeight * data.length);
+
+  var bar = chart.selectAll("g")
+    .data(data)
+  .enter().append("g")
+    .attr("fill", function(d, i) { return color(i); } )
+    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+      bar.append("rect")
+          .attr("width", x)
+          .attr("height", barHeight - 1);
+
+      bar.append("text")
+          .attr("x", function(d) { return x(d) - 3; })
+          .attr("y", barHeight / 2)
+          .attr("dy", ".35em")
+          .attr("fill", "black")
+          .text(function(d) { return d; });
 </script>
