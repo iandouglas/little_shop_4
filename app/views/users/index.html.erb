@@ -1,5 +1,23 @@
 <section class="container" id="statistics">
   <section id="accordian">
+    <section class="card" id="merchants-by-revenue">
+      <section class="card-header">
+        <h4 class="mb-0">
+          <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-merchants-by-revenue" aria-expanded="false" aria-controls="collapse-merchants-by-revenue">
+            Revenue for All Merchants
+          </button>
+        </h4>
+      </section>
+      <section class="collapse" id="collapse-merchants-by-revenue">
+        <svg id="merchants-by-revenue-chart">
+        </svg>
+        <ul class="list-group">
+          <% @total_sales_by_merchant.each do |merchant|%>
+          <li class="list-group-item" id="merchant-<%= merchant.id %>"> <%= merchant.name %>. Revenue: <%= number_to_currency(merchant.revenue) %> </li>
+          <% end %>
+        </ul>
+      </section>
+    </section>
     <section class="card" id="biggest-merchants">
       <section class="card-header">
         <h4 class="mb-0">
@@ -9,6 +27,8 @@
         </h4>
       </section>
       <section class="collapse" id="collapse-biggest-merchants">
+        <svg id="biggest-merchants-chart">
+        </svg>
         <ul class="list-group">
           <% @top_merchants_by_revenue.each do |merchant|%>
           <li class="list-group-item"> <%= merchant.name %>. Revenue: <%= number_to_currency(merchant.revenue) %> </li>
@@ -51,6 +71,8 @@
         </h3>
       </section>
       <section class="collapse" id="collapse-top-states">
+        <svg id="top-states-chart">
+        </svg>
         <ul class="list-group">
           <% @top_states.each do |state|%>
           <li class="list-group-item"> <%= state.state %>. Number of orders: <%= state.order_count %> </li>
@@ -65,6 +87,8 @@
         </h4>
       </section>
       <section class="collapse" id="collapse-top-cities">
+        <svg id="top-cities-chart">
+        </svg>
         <ul class="list-group">
           <% @top_cities.each do |city|%>
           <li class="list-group-item"> <%= city.location %>. Number of orders: <%= city.city_quantity %> </li>
@@ -79,6 +103,8 @@
         </h4>
       </section>
       <section class="collapse" id="collapse-biggest-orders">
+        <svg id="biggest-orders-chart">
+        </svg>
         <ul class="list-group">
           <% @biggest_orders.each do |order|%>
           <li class="list-group-item"> Order: <%= order.id%> Quantity: <%= order.total_quantity %> </li>
@@ -121,3 +147,172 @@
     <% end %>
   </tbody>
 </table>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+  var w = 300,
+  h = 300,
+  width = 450,
+  r = 100,
+  barHeight = 20,
+  color = d3.scale.category20c();
+  var arc = d3.svg.arc()
+  .outerRadius(r);
+
+  var data = <%= @total_sales_by_merchant.map {|merchant| {label: merchant.name, value: merchant.revenue}}.to_json.html_safe %>;
+
+  var vis = d3.select("#merchants-by-revenue-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")");
+
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= @top_merchants_by_revenue.map {|merchant| {label: merchant.name, value: merchant.revenue}}.to_json.html_safe %>
+  var vis = d3.select("#biggest-merchants-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")");
+
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= @top_states.map {|state| {label: state.state, value: state.order_count}}.to_json.html_safe %>
+  var vis = d3.select("#top-states-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")");
+
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= @top_cities.map {|city| {label: city.location, value: city.city_quantity}}.to_json.html_safe %>
+  var vis = d3.select("#top-cities-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")");
+
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+    var data = <%= @biggest_orders.map {|order| {label: "Order #{order.id}", value: order.total_quantity}}.to_json.html_safe %>;
+
+    var x = d3.scale.linear()
+      .domain([0, d3.max(data, function(d){
+        return d.value;
+      })])
+      .range([0, width]);
+
+    var chart = d3.select('#biggest-orders-chart')
+        .data(data)
+          .attr("width", width + 75)
+          .attr("height", barHeight * data.length);
+
+    var bar = chart.selectAll("g")
+      .data(data)
+    .enter().append("g")
+      .attr("fill", function(d, i) { return color(i); } )
+      .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+        bar.append("rect")
+            .attr("width", function(d) {
+              return x(d.value);
+            })
+            .attr("height", barHeight - 1);
+
+        bar.append("text")
+            .attr("x", function(d) { return x(d.value) - 3; })
+            .attr("y", barHeight / 2)
+            .attr("dy", ".35em")
+            .attr("fill", "black")
+            .text(function(d) { return d.label; });
+</script>

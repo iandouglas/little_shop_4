@@ -15,7 +15,6 @@ RSpec.describe User, type: :model do
         .only_integer
         }
 
-
     it {should validate_length_of(:name)
         .is_at_least(1)
     }
@@ -114,6 +113,12 @@ RSpec.describe User, type: :model do
       end
     end
 
+    describe '.current_inventory' do
+      it 'returns the current total stock for a merchant' do
+        expect(@merchant.current_inventory).to eq(60)
+      end
+    end
+
     describe '.top_states(limit)' do
       it 'returns an array of the top # states where the most items were sold by a specific merchant along with the quantity shipped to each state' do
         expect(@merchant.top_states(3).first.state).to eq('Wisconsin')
@@ -146,6 +151,40 @@ RSpec.describe User, type: :model do
       it 'returns the top 3 users who have spent the most money on a specific merchant\'s items, along with the total amount spent by each' do
         expect(@merchant.top_spenders(3).first.name).to eq(@user_1.name)
         expect(@merchant.top_spenders(3).first.total_spent).to eq(100)
+      end
+    end
+
+    describe '.revenue_by_month(limit)' do
+      it 'Returns the revenue for the past (limit) number of months' do
+        new_merchant = create(:merchant)
+        new_item = create(:item, user: new_merchant)
+        january = create(:order_item, quantity: 2, item: new_item, created_at: 1.month.ago)
+        january = create(:order_item, quantity: 6, item: new_item, created_at: 1.month.ago)
+        december = create(:order_item, quantity: 3, item: new_item, created_at: 2.months.ago)
+        november = create(:order_item, quantity: 4, item: new_item, created_at: 3.months.ago)
+        october = create(:order_item, quantity: 4, item: new_item, created_at: 4.months.ago)
+        september = create(:order_item, quantity: 2, item: new_item, created_at: 5.months.ago)
+        august = create(:order_item, quantity: 1, item: new_item, created_at: 6.months.ago)
+        july = create(:order_item, quantity: 8, item: new_item, created_at: 7.months.ago)
+
+        result = new_merchant.revenue_by_month(6)
+
+        expect(result.length).to eq(5)
+        expect(result[0].revenue).to eq(8 * new_item.price)
+        expect(result[0].month).to eq(1)
+        expect(result[0].year).to eq(2019)
+        expect(result[1].revenue).to eq(3 * new_item.price)
+        expect(result[1].month).to eq(12)
+        expect(result[1].year).to eq(2018)
+        expect(result[2].revenue).to eq(4 * new_item.price)
+        expect(result[2].month).to eq(11)
+        expect(result[2].year).to eq(2018)
+        expect(result[3].revenue).to eq(4 * new_item.price)
+        expect(result[3].month).to eq(10)
+        expect(result[3].year).to eq(2018)
+        expect(result[4].revenue).to eq(2 * new_item.price)
+        expect(result[4].month).to eq(9)
+        expect(result[4].year).to eq(2018)
       end
     end
   end
@@ -254,5 +293,15 @@ RSpec.describe User, type: :model do
       end
     end
 
+    describe 'total_sales_by_merchant' do
+      it "returns merchants who have been part of completed orders by total revenue" do
+        actual = User.total_sales_by_merchant
+        expect(actual).to eq ([@merchant_1, @merchant_3, @merchant_2, @merchant_4])
+        expect(actual[0].revenue).to eq(500)
+        expect(actual[1].revenue).to eq(100)
+        expect(actual[2].revenue).to eq(30)
+        expect(actual[3].revenue).to eq(30)
+      end
+    end
   end
 end

@@ -71,7 +71,7 @@ RSpec.describe 'Merchant dashboard page' do
         within(class: "statistics") do
           expect(page).to have_content("#{@merchant.top_items_for_merchant(5).first.name}")
           expect(page).to have_content("#{@merchant.top_items_for_merchant(5).first.total_quantity}")
-          expect(page).to have_content("You have sold #{@merchant.items_sold_by_quantity} items which is 22% of your total inventory.")
+          expect(page).to have_content("You have sold #{@merchant.items_sold_by_quantity} items which is #{number_to_percentage(@merchant.items_sold_by_percentage * 100, strip_insignificant_zeros: true)} of your total inventory.")
           expect(page).to have_content("#{@merchant.top_states(3).first.state}")
           expect(page).to have_content("#{@merchant.top_states(3).first.state_quantity}")
           expect(page).to have_content("#{@merchant.top_cities(3).first.location}")
@@ -82,6 +82,81 @@ RSpec.describe 'Merchant dashboard page' do
           expect(page).to have_content("#{@merchant.top_customer_by_items.item_count}")
           expect(page).to have_content("#{@merchant.top_spenders(3).first.name}")
           expect(page).to have_content("$#{@merchant.top_spenders(3).first.total_spent}")
+        end
+      end
+
+      it 'I see a pie chart representing my inventory sold' do
+        login_as(@merchant)
+
+        visit dashboard_path
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#inventory-chart')
+        end
+      end
+
+      it 'I see a pie chart representing my top 3 states' do
+        login_as(@merchant)
+
+        visit dashboard_path
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#top-states-chart')
+        end
+      end
+
+      it 'I see a pie chart representing my top 3 cities' do
+        login_as(@merchant)
+
+        visit dashboard_path
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#top-cities-chart')
+        end
+      end
+
+      it 'I see a pie chart representing my top 5 items' do
+        login_as(@merchant)
+
+        visit dashboard_path
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#top-items-chart')
+        end
+      end
+
+      it 'I see a pie chart representing my top 3 customers' do
+        login_as(@merchant)
+
+        visit dashboard_path
+
+        within(".statistics") do
+          expect(page).to have_css('svg')
+          expect(page).to have_css('#top-customers-chart')
+        end
+      end
+
+      it 'I see a bar graph representing my revenue by month for the past 12 months' do
+        new_merchant = create(:merchant)
+        new_item = create(:item, user: new_merchant)
+        january = create(:order_item, quantity: 2, item: new_item, created_at: 1.month.ago)
+        january = create(:order_item, quantity: 6, item: new_item, created_at: 1.month.ago)
+        december = create(:order_item, quantity: 3, item: new_item, created_at: 2.months.ago)
+        november = create(:order_item, quantity: 4, item: new_item, created_at: 3.months.ago)
+        october = create(:order_item, quantity: 4, item: new_item, created_at: 4.months.ago)
+        september = create(:order_item, quantity: 2, item: new_item, created_at: 5.months.ago)
+        august = create(:order_item, quantity: 1, item: new_item, created_at: 6.months.ago)
+        july = create(:order_item, quantity: 8, item: new_item, created_at: 7.months.ago)
+        login_as(new_merchant)
+
+        visit dashboard_path
+
+        within(".statistics") do
+          expect(page).to have_css('#revenue-by-month-chart')
         end
       end
 

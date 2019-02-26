@@ -1,90 +1,105 @@
-<section>
+<section class="container">
   <h1 class="text-center">Your Dashboard</h1>
   <%= link_to 'Downgrade Merchant to User', admin_downgrade_merchant_path(@user), method: :put if current_admin?  %>
   <%= render partial: '/users/profile' %>
-
   <%= link_to 'My Items', dashboard_items_path if current_merchant? %>
   <%= link_to 'My Items', admin_merchant_items_path(@user) if current_admin? %>
   <%= link_to 'Manage My Coupons', dashboard_coupons_path %>
-
   <div class="statistics">
-
-    <div class="progress">
-      <div class="progress-bar" role="progressbar" style="width: <%=number_to_percentage((@user.items_sold_by_percentage * 100), precision: 0) %>;" aria-valuenow=" <%=@user.items_sold_by_percentage * 100.round(2) %> " aria-valuemin="0" aria-valuemax="100"> <%=number_to_percentage((@user.items_sold_by_percentage * 100), precision: 0) %>
-    </div>
-  </div>
-
-    <p>Items Sold: You have sold <%= @user.items_sold_by_quantity %> items which is <%=number_to_percentage((@user.items_sold_by_percentage * 100), precision: 0) %> of your total inventory. </p>
-
     <section class="row">
-      <div class="col">
-
-        <h6 class="text-center">Top 5 Items</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-               <% @user.top_items_for_merchant(5).each do |item| %>
-              <tr>
-                <td> <%= item.name %> </td>
-                <td> <%= item.total_quantity %> </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
+      <div class="col-12 col-md-6 text-center">
+        <svg id="inventory-chart">
+        </svg>
+        <p>You have sold <%= @user.items_sold_by_quantity %> items which is <%= number_to_percentage(@user.items_sold_by_percentage * 100, strip_insignificant_zeros: true) %> of your total inventory.</p>
       </div>
-
-      <div class="col">
-
-        <h6 class="text-center">Top 3 States</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>State</th>
-                <th>Quantity</th>
+      <div class="col-12 col-md-6 text-center">
+        <svg id="revenue-by-month-chart">
+        </svg>
+        <table class="table table-condensed">
+          <thead>
+            <th>Month</th>
+            <th>Revenue</th>
+          </thead>
+          <tbody>
+            <% @user.revenue_by_month(12).each do |month| %>
+              <tr id="month-<%= month.month %>">
+                <td><%= "#{month.month.to_i}-#{month.year.to_i}" %></td>
+                <td><%= number_to_currency(month.revenue) %></td>
               </tr>
-            </thead>
-            <tbody>
-              <% @user.top_states(3).each do |state| %>
-              <tr>
-                <td> <%= state.state %> </td>
-                <td> <%= state.state_quantity %> </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
-      </div>
-
-      <div class="col">
-
-        <h6 class="text-center">Top 3 Cities</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>City</th>
-                <th>Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @user.top_cities(3).each do |city| %>
-              <tr>
-                <td> <%= city.location %> </td>
-                <td> <%= city.city_quantity %> </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     </section>
-
     <section class="row">
-      <div class="col">
-
-        <h6 class="text-center">Customer With Most Orders:</h6>
+      <div class="col text-center">
+        <h6>Top 5 Items</h6>
+        <svg id="top-items-chart">
+        </svg>
+        <table class="table table-condensed" id="top-selling-items">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user.top_items_for_merchant(5).each do |item| %>
+            <tr>
+              <td> <%= item.name %> </td>
+              <td> <%= item.total_quantity %> </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="col text-center">
+        <h6>Top 3 States</h6>
+        <svg id="top-states-chart">
+        </svg>
+        <table class="table table-condensed" id="top-selling-items">
+          <thead>
+            <tr>
+              <th>State</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user.top_states(3).each do |state| %>
+            <tr>
+              <td> <%= state.state %> </td>
+              <td> <%= state.state_quantity %> </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="col text-center">
+        <h6>Top 3 Cities</h6>
+        <svg id="top-cities-chart">
+        </svg>
+        <table class="table table-condensed" id="top-selling-items">
+          <thead>
+            <tr>
+              <th>City</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user.top_cities(3).each do |city| %>
+            <tr>
+              <td> <%= city.location %> </td>
+              <td> <%= city.city_quantity %> </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="row">
+      <div class="col align-self-center">
+        <div>
+          <h6 class="text-center">Customer With Most Orders:</h6>
           <table class="table table-condensed" id="top-selling-items">
             <thead>
               <tr>
@@ -99,11 +114,7 @@
               </tr>
             </tbody>
           </table>
-      </div>
-
-      <div class="col">
-
-        <h6 class="text-center">Customer with Most Items</h6>
+          <h6 class="text-center">Customer with Most Items</h6>
           <table class="table table-condensed" id="top-selling-items">
             <thead>
               <tr>
@@ -118,57 +129,252 @@
               </tr>
             </tbody>
           </table>
+        </div>
       </div>
-
-      <div class="col">
-
-        <h6 class="text-center">3 Biggest Spenders</h6>
-          <table class="table table-condensed" id="top-selling-items">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Total spent</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @user.top_spenders(3).each do |user| %>
-              <tr>
-                <td> <%= user.name %> </td>
-                <td> <%= number_to_currency(user.total_spent) %> </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
+      <div class="col text-center">
+        <h6>3 Biggest Spenders</h6>
+        <svg id="top-customers-chart">
+        </svg>
+        <table class="table table-condensed" id="top-customers">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Total spent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @user.top_spenders(3).each do |user| %>
+            <tr>
+              <td> <%= user.name %> </td>
+              <td> <%= number_to_currency(user.total_spent) %> </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     </section>
   </div>
-
-
-<div class="container">
-  <h6 class="text-center">Pending Orders</h6>
-
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Order ID</th>
-        <th>Placed on</th>
-        <th>Total Items</th>
-        <th>Total Amount</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @orders.each do |order| %>
-      <tr class="order-<%= order.id %>">
-        <td><%= link_to "##{order.id}", merchant_order_path(order) if current_merchant? %>
-         <%= link_to "##{order.id}", admin_order_path(order) if current_admin? %></td>
-        <td><%= order.created_at.localtime.strftime("%m-%d-%Y") %> </td>
-        <td><%= order.total_items_for_merchant(@user) %> </td>
-        <td><%= number_to_currency(order.total_value_for_merchant(@user)) %> </td>
-      </tr>
-      <% end %>
-    </tbody>
-
-  </table>
-
-
+  <div class="container">
+    <h6 class="text-center">Pending Orders</h6>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Placed on</th>
+          <th>Total Items</th>
+          <th>Total Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @orders.each do |order| %>
+          <tr class="order-<%= order.id %>">
+            <td><%= link_to "##{order.id}", merchant_order_path(order) if current_merchant? %>
+              <%= link_to "##{order.id}", admin_order_path(order) if current_admin? %></td>
+              <td><%= order.created_at.localtime.strftime("%m-%d-%Y") %> </td>
+              <td><%= order.total_items_for_merchant(@user) %> </td>
+              <td><%= number_to_currency(order.total_value_for_merchant(@user)) %> </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 </section>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+<script type="text/javascript">
+  var w = 300,
+  h = 300,
+  width = 450,
+  r = 100,
+  barHeight = 20,
+  color = d3.scale.category20c();
+  var data = [{label: "Remaining Inventory", value: <%= @user.current_inventory %>},
+              {label: "Items Sold", value: <%= @user.items_sold_by_quantity %>}];
+
+  var vis = d3.select("#inventory-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
+  var arc = d3.svg.arc()
+      .outerRadius(r);
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= @user.revenue_by_month(12).map {|month| month.revenue} %>;
+
+  var x = d3.scale.linear()
+    .domain([0, d3.max(data)])
+    .range([0, width]);
+
+  var chart = d3.select('#revenue-by-month-chart')
+      .data(data)
+        .attr("width", width + 50)
+        .attr("height", barHeight * data.length);
+
+  var bar = chart.selectAll("g")
+    .data(data)
+  .enter().append("g")
+    .attr("fill", function(d, i) { return color(i); } )
+    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+      bar.append("rect")
+          .attr("width", x)
+          .attr("height", barHeight - 1);
+
+      bar.append("text")
+          .attr("x", function(d) { return x(d) - 3; })
+          .attr("y", barHeight / 2)
+          .attr("dy", ".35em")
+          .attr("fill", "black")
+          .text(function(d) { return d; });
+
+  var data = <%= (@user.top_states(3).map {|state| {label: state.state, value: state.state_quantity}}.to_json).html_safe %>
+
+  var vis = d3.select("#top-states-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= (@user.top_cities(3).map {|city| {label: city.location, value: city.city_quantity}}.to_json).html_safe %>
+
+  var vis = d3.select("#top-cities-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= (@user.top_items_for_merchant(5).map {|item| {label: item.total_quantity, value: item.total_quantity}}.to_json).html_safe %>
+
+  var vis = d3.select("#top-items-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= (@user.top_spenders(3).map {|customer| {label: customer.name, value: customer.total_spent}}.to_json).html_safe %>
+
+  var vis = d3.select("#top-customers-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+</script>

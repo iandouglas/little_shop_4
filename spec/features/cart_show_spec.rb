@@ -179,6 +179,19 @@ RSpec.describe 'cart show page', type: :feature do
       expect(page).to have_content "Discounted Total: #{number_to_currency(0)}"
     end
 
+    it 'Percentage coupons discounts cannot reduce total cost below 0' do
+      excessive_percentage_coupon = create(:percentage_coupon, value: 101, user: @merchant)
+      free_item = create(:item, price: 0, user: @merchant)
+      visit logout_path # reset cart
+      add_item_to_cart(free_item)
+
+      visit cart_path
+      fill_in 'coupon', with: excessive_percentage_coupon.name
+      click_button 'Add Coupon'
+
+      expect(page).to have_content "Discounted Total: #{number_to_currency(0)}"
+    end
+
     it 'users can remove coupons from their cart' do
       visit cart_path
       fill_in 'coupon', with: @unused_coupon.name
