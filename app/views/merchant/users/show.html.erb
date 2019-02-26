@@ -32,8 +32,10 @@
       </div>
     </section>
     <section class="row">
-      <div class="col">
-        <h6 class="text-center">Top 5 Items</h6>
+      <div class="col text-center">
+        <h6>Top 5 Items</h6>
+        <svg id="top-items-chart">
+        </svg>
         <table class="table table-condensed" id="top-selling-items">
           <thead>
             <tr>
@@ -95,43 +97,45 @@
       </div>
     </section>
     <section class="row">
-      <div class="col">
-        <h6 class="text-center">Customer With Most Orders:</h6>
-        <table class="table table-condensed" id="top-selling-items">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><%= @user.top_customer_by_orders.name if @user.top_customer_by_orders %></td>
-              <td>  <%= @user.top_customer_by_orders.order_count if @user.top_customer_by_orders %> </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="col align-self-center">
+        <div>
+          <h6 class="text-center">Customer With Most Orders:</h6>
+          <table class="table table-condensed" id="top-selling-items">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><%= @user.top_customer_by_orders.name if @user.top_customer_by_orders %></td>
+                <td>  <%= @user.top_customer_by_orders.order_count if @user.top_customer_by_orders %> </td>
+              </tr>
+            </tbody>
+          </table>
+          <h6 class="text-center">Customer with Most Items</h6>
+          <table class="table table-condensed" id="top-selling-items">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td> <%= @user.top_customer_by_items.name if @user.top_customer_by_items %> </td>
+                <td> <%= @user.top_customer_by_items.item_count if @user.top_customer_by_items %> </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="col">
-        <h6 class="text-center">Customer with Most Items</h6>
-        <table class="table table-condensed" id="top-selling-items">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Quantity</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td> <%= @user.top_customer_by_items.name if @user.top_customer_by_items %> </td>
-              <td> <%= @user.top_customer_by_items.item_count if @user.top_customer_by_items %> </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="col">
-        <h6 class="text-center">3 Biggest Spenders</h6>
-        <table class="table table-condensed" id="top-selling-items">
+      <div class="col text-center">
+        <h6>3 Biggest Spenders</h6>
+        <svg id="top-customers-chart">
+        </svg>
+        <table class="table table-condensed" id="top-customers">
           <thead>
             <tr>
               <th>Name</th>
@@ -256,9 +260,6 @@
       .append("svg:g")
           .attr("transform", "translate(" + r + "," + r + ")")
 
-  var arc = d3.svg.arc()
-      .outerRadius(r);
-
   var pie = d3.layout.pie()
       .value(function(d) { return d.value; });
 
@@ -290,8 +291,70 @@
       .append("svg:g")
           .attr("transform", "translate(" + r + "," + r + ")")
 
-  var arc = d3.svg.arc()
-      .outerRadius(r);
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= (@user.top_items_for_merchant(5).map {|item| {label: item.total_quantity, value: item.total_quantity}}.to_json).html_safe %>
+
+  var vis = d3.select("#top-items-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
+
+  var pie = d3.layout.pie()
+      .value(function(d) { return d.value; });
+
+  var arcs = vis.selectAll("g.slice")
+      .data(pie)
+      .enter()
+          .append("svg:g")
+              .attr("class", "slice");
+
+      arcs.append("svg:path")
+              .attr("fill", function(d, i) { return color(i); } )
+              .attr("d", arc);
+
+      arcs.append("svg:text")
+              .attr("transform", function(d) {
+              d.innerRadius = 0;
+              d.outerRadius = r;
+              return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr("text-anchor", "middle")
+          .text(function(d, i) { return data[i].label; });
+
+  var data = <%= (@user.top_spenders(3).map {|customer| {label: customer.name, value: customer.total_spent}}.to_json).html_safe %>
+
+  var vis = d3.select("#top-customers-chart")
+      .data([data])
+          .attr("width", r * 2)
+          .attr("height", r * 2)
+      .append("svg:g")
+          .attr("transform", "translate(" + r + "," + r + ")")
+
 
   var pie = d3.layout.pie()
       .value(function(d) { return d.value; });
