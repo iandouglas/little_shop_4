@@ -303,12 +303,5 @@ RSpec.describe User, type: :model do
         expect(actual[3].revenue).to eq(30)
       end
     end
-
-    describe 'total_sales' do
-      it 'returns the total sales for the site (completed orders only)' do
-        expect(User.total_sales).to eq(660)
-      end
-    end
-
   end
 end
