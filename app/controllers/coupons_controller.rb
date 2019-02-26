@@ -2,7 +2,7 @@ class CouponsController < ApplicationController
   before_action :require_shopper
 
   def create
-    coupon = Coupon.find_by_name(params[:coupon])
+    coupon = Coupon.find_by_name(params[:coupon].upcase)
     if coupon && !coupon.disabled
       unless  current_user && current_user.redeemed_coupon?(coupon)
         session[:coupon] = coupon.id

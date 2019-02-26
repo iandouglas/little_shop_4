@@ -152,6 +152,7 @@ class User < ApplicationRecord
                   EXTRACT(MONTH FROM order_items.created_at) AS month,
                   EXTRACT(YEAR FROM order_items.created_at) AS year")
          .where("order_items.created_at > ?", limit.months.ago)
+         .where(order_items: {fulfilled: true})
          .group("year, month")
          .order('year desc, month desc')
   end
