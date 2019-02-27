@@ -16,6 +16,6 @@ class Coupon < ApplicationRecord
     }
 
   def unused?
-    orders.empty?
+    orders.where.not(status: 'cancelled').empty?
   end
 end
