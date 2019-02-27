@@ -77,7 +77,7 @@ class User < ApplicationRecord
   end
 
   def redeemed_coupon?(coupon)
-    orders.find_by(coupon: coupon).instance_of?(Order)
+    !(orders.where(coupon: coupon).where.not(status: 'cancelled').empty?)
   end
 
   def top_items_for_merchant(limit)

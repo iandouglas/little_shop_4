@@ -53,17 +53,15 @@ RSpec.describe 'order show page', type: :feature do
       expect(page).to have_content(@order.quantity_of_items)
       expect(page).to have_content(number_to_currency(@order.grand_total))
       expect(page).to_not have_content("Coupon Used:")
-      expect(page).to_not have_content("Discounted Total:")
     end
 
-    it 'shows me the coupon used and the discounted price if present' do
+    it 'shows me the coupon used if present' do
       coupon = create(:coupon)
-      @order.update(coupon: coupon, discounted_total: 1.23)
+      @order.update(coupon: coupon)
 
       visit profile_order_path(@order)
 
       expect(page).to have_content("Coupon Used: #{coupon.name}")
-      expect(page).to have_content("Discounted Total: #{number_to_currency(@order.discounted_total)}")
     end
 
     describe 'I can cancel pending and processing orders' do

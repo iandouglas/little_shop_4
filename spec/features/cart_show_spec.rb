@@ -205,12 +205,106 @@ RSpec.describe 'cart show page', type: :feature do
       expect(page).to_not have_content 'Current Coupon:'
       expect(page).to_not have_content 'Discounted Total:'
     end
+  end
+
+  describe 'checking out with coupons' do
+    before :each do
+      @user = create(:user)
+      @merchant_1 = create(:merchant)
+      @merchant_2 = create(:merchant)
+      @item_1 = create(:item, user: @merchant_1, price: 10.0)
+      @item_2 = create(:item, user: @merchant_2, price: 50.0)
+      @percentage_coupon = create(:percentage_coupon, user: @merchant_1, value: 25.0)
+      @high_value_percentage_coupon = create(:percentage_coupon, user: @merchant_1, value: 125.0)
+      @dollar_coupon= create(:coupon, user: @merchant_2, value: 10.0)
+      @high_value_dollar_coupon = create(:coupon, user: @merchant_2, value: 100.0)
+      login_as(@user)
+      add_item_to_cart(@item_1)
+      add_item_to_cart(@item_2)
+    end
+
+    it 'I can checkout with a percentage based coupon' do
+      visit cart_path
+      fill_in 'coupon', with: @percentage_coupon.name
+      click_button 'Add Coupon'
+
+      click_button 'Checkout'
+
+      visit profile_order_path(Order.last)
+
+      within "#item-#{@item_1.id}" do
+        expect(page).to have_content("Price: #{number_to_currency(@item_1.price * (1 - (@percentage_coupon.value / 100)))}")
+      end
+
+      within "#item-#{@item_2.id}" do
+        expect(page).to have_content("Price: #{number_to_currency(@item_2.price)}")
+      end
+
+      expect(page).to have_content("Grand total: #{number_to_currency(@item_1.price * (1 - (@percentage_coupon.value / 100)) + @item_2.price)}")
+    end
+
+    it 'I can checkout with a percentage based coupon and not recieve a negative total' do
+      visit cart_path
+      fill_in 'coupon', with: @high_value_percentage_coupon.name
+      click_button 'Add Coupon'
+
+      click_button 'Checkout'
+
+      visit profile_order_path(Order.last)
+
+      within "#item-#{@item_1.id}" do
+        expect(page).to have_content("Price: #{number_to_currency(0)}")
+      end
+
+      within "#item-#{@item_2.id}" do
+        expect(page).to have_content("Price: #{number_to_currency(@item_2.price)}")
+      end
+
+      expect(page).to have_content("Grand total: #{number_to_currency(@item_2.price)}")
+    end
+
+    it 'I can checkout with a dollar based coupon' do
+      visit cart_path
+      fill_in 'coupon', with: @dollar_coupon.name
+      click_button 'Add Coupon'
+
+      click_button 'Checkout'
+
+      visit profile_order_path(Order.last)
+
+      within "#item-#{@item_1.id}" do
+        expect(page).to have_content("Price: #{number_to_currency(@item_1.price)}")
+      end
+
+      within "#item-#{@item_2.id}" do
+        expect(page).to have_content("Price: #{number_to_currency(@item_2.price - @dollar_coupon.value)}")
+      end
+
+      expect(page).to have_content("Grand total: #{number_to_currency(@item_2.price - @dollar_coupon.value + @item_1.price)}")
+    end
+
+    it 'I can checkout with a dollar based coupon with a value higher than my item price' do
+      visit cart_path
+      fill_in 'coupon', with: @high_value_dollar_coupon.name
+      click_button 'Add Coupon'
+
+      click_button 'Checkout'
+
+      visit profile_order_path(Order.last)
+
+      within "#item-#{@item_1.id}" do
+        expect(page).to have_content("Price: #{number_to_currency(@item_1.price)}")
+      end
+
+      within "#item-#{@item_2.id}" do
+        expect(page).to have_content("Price: #{number_to_currency(0)}")
+      end
+
+      expect(page).to have_content("Grand total: #{number_to_currency(@item_1.price)}")
+    end
 
     it 'If I checkout with a coupon in my cart it is not present in my next order' do
-      login_as(@user)
-      visit cart_path
-
-      fill_in 'coupon', with: @unused_coupon.name
+      fill_in 'coupon', with: @percentage_coupon.name
       click_button 'Add Coupon'
 
       click_button 'Checkout'
@@ -223,6 +317,7 @@ RSpec.describe 'cart show page', type: :feature do
       expect(page).to_not have_content('Discounted Total:')
     end
   end
+
 
   context "as a visitor" do
     it 'I don\'t see a button to checkout' do

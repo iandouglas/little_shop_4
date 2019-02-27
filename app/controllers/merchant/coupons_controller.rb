@@ -40,12 +40,17 @@ class Merchant::CouponsController < Merchant::BaseController
 
   def update
     @coupon = Coupon.find(params[:id])
-    if @coupon.update(coupon_params)
-      flash[:success] = "Coupon \"#{@coupon.name}\" has been updated."
-      redirect_to dashboard_coupon_path(@coupon)
+    if @coupon.unused?
+      if @coupon.update(coupon_params)
+        flash[:success] = "Coupon \"#{@coupon.name}\" has been updated."
+        redirect_to dashboard_coupon_path(@coupon)
+      else
+        flash[:danger] = "There are problems with the provided information."
+        render :edit
+      end
     else
-      flash[:danger] = "There are problems with the provided information."
-      render :edit
+      flash[:danger] = "Unable to update coupon. (Already redeemed)."
+      redirect_to dashboard_coupon_path(@coupon)
     end
   end
 

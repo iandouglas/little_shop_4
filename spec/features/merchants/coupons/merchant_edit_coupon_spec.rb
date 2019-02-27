@@ -78,5 +78,18 @@ RSpec.describe 'Editing coupons', type: :feature do
 
       expect(page).to have_content("The page you were looking for doesn't exist")
     end
+
+    it 'I cannot edit used coupons' do
+      create(:order, coupon: @coupon)
+
+      visit dashboard_coupon_path(@coupon)
+
+      expect(page).to_not have_link 'Edit Coupon'
+
+      visit edit_dashboard_coupon_path(@coupon)
+      click_button 'Submit'
+
+      expect(page).to have_content("Unable to update coupon. (Already redeemed).")
+    end
   end
 end

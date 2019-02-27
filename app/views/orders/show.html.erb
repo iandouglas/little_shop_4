@@ -59,7 +59,6 @@
           <h3>Grand total: <%= number_to_currency(@order.grand_total) %></h3>
           <% if @order.coupon %>
             <h6>Coupon Used: <%= @order.coupon.name %></h6>
-            <h5>Discounted Total: <%= number_to_currency(@order.discounted_total) %></h5>
           <% end %>
       </div>
     </div>

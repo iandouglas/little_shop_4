@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190224221643) do
+ActiveRecord::Schema.define(version: 20190227022027) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,7 +57,6 @@ ActiveRecord::Schema.define(version: 20190224221643) do
     t.datetime "updated_at", null: false
     t.integer "status", default: 0
     t.bigint "coupon_id"
-    t.float "discounted_total", default: 0.0
     t.index ["coupon_id"], name: "index_orders_on_coupon_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end

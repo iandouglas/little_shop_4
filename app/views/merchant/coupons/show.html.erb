@@ -10,7 +10,6 @@
           <li class="list-group-item">Last Updated: <%= @coupon.updated_at.strftime("%B, %d %Y at %I:%M %p %Z") %></li>
           <li class="list-group-item">Current Status: <%= "Active" unless @coupon.disabled %>
           <%= "Disabled" if @coupon.disabled %></li>
-          <li class="list-group-item"><%= link_to 'Edit Coupon', edit_dashboard_coupon_path(@coupon) %></li>
         </ul>
         <br/>
         <div class="row ml-auto">
@@ -21,11 +20,14 @@
             <%= button_to 'Disable Coupon', dashboard_disable_coupon_path(@coupon), method: :put, class: 'btn btn-warning' %>
             <% end %>
           </div>
+          <% if @coupon.unused? %>
           <div class="col-4">
-            <% if @coupon.unused? %>
             <%= button_to 'Delete Coupon', dashboard_coupon_path(@coupon), method: :delete, class: 'btn btn-danger' %>
-            <% end %>
           </div>
+          <div class="col-4">
+            <%= link_to 'Edit Coupon', edit_dashboard_coupon_path(@coupon), class: 'btn btn-primary' %>
+          </div>
+          <% end %>
         </div>
       </div>
     </div>
