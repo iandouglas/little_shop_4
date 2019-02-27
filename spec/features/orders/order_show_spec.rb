@@ -57,7 +57,7 @@ RSpec.describe 'order show page', type: :feature do
 
     it 'shows me the coupon used if present' do
       coupon = create(:coupon)
-      @order.update(coupon: coupon, discounted_total: 1.23)
+      @order.update(coupon: coupon)
 
       visit profile_order_path(@order)
 

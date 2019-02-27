@@ -6,12 +6,6 @@ class Order < ApplicationRecord
 
   validates_presence_of :status
 
-  validates :discounted_total,
-    presence: false,
-    numericality: {
-      greater_than_or_equal_to: 0
-  }
-
   enum status: ['pending', 'processing', 'completed', 'cancelled']
 
   def total_items_for_merchant(merchant)

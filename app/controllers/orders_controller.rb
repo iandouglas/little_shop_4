@@ -17,7 +17,7 @@ class OrdersController < ApplicationController
     end
     if session[:coupon]
       @coupon = Coupon.find(session[:coupon])
-      @order.update(coupon: @coupon, discounted_total: @cart.discounted_total(@coupon))
+      @order.update(coupon: @coupon)
       parse_coupon
       session.delete(:coupon)
     else
