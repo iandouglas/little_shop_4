@@ -29,4 +29,32 @@ class Cart
       Item.find(item).price * quantity.to_i
     end
   end
+
+  def discounted_total(coupon)
+    unused_value = coupon.value
+    @contents.sum do |item, quantity|
+      item = Item.find(item)
+      if item.user_id == coupon.user_id
+        if coupon.percent
+          if coupon.value > 100
+            0.0
+          else
+            item.price * quantity.to_i * (100 - coupon.value) / 100
+          end
+        else
+          subtotal_for_item = item.price * quantity.to_i
+          if subtotal_for_item > unused_value
+            new_subtotal = subtotal_for_item - unused_value
+            unused_value = 0
+          else
+            unused_value -= subtotal_for_item
+            new_subtotal = 0
+          end
+          new_subtotal
+        end
+      else
+        item.price * quantity.to_i
+      end
+    end
+  end
 end

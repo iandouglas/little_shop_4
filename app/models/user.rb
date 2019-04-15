@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_many :orders
   has_many :items
+  has_many :coupons
 
   has_secure_password
 
@@ -63,6 +64,21 @@ class User < ApplicationRecord
    .limit(3)
   end
 
+  def self.total_sales_by_merchant
+    joins(items: :orders)
+    .select('users.*, sum(order_items.unit_price * order_items.quantity) as revenue')
+    .where(orders: {status: 'completed'})
+    .group(:id)
+    .order('revenue desc')
+  end
+
+  def coupon_count
+    coupons.count
+  end
+
+  def redeemed_coupon?(coupon)
+    !(orders.where(coupon: coupon).where.not(status: 'cancelled').empty?)
+  end
 
   def top_items_for_merchant(limit)
     items.joins(:order_items)
@@ -128,6 +144,21 @@ class User < ApplicationRecord
          .group('users.id')
          .order('total_spent desc')
          .limit(limit)
+  end
+
+  def revenue_by_month(limit)
+    items.joins(:order_items)
+         .select("SUM(order_items.unit_price * order_items.quantity) AS revenue,
+                  EXTRACT(MONTH FROM order_items.created_at) AS month,
+                  EXTRACT(YEAR FROM order_items.created_at) AS year")
+         .where("order_items.created_at > ?", limit.months.ago)
+         .where(order_items: {fulfilled: true})
+         .group("year, month")
+         .order('year desc, month desc')
+  end
+
+  def current_inventory
+    items.sum(:quantity)
   end
 
   def self.all_merchants

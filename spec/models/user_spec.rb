@@ -15,7 +15,6 @@ RSpec.describe User, type: :model do
         .only_integer
         }
 
-
     it {should validate_length_of(:name)
         .is_at_least(1)
     }
@@ -38,6 +37,7 @@ RSpec.describe User, type: :model do
   describe 'relationships' do
     it {should have_many :orders}
     it {should have_many :items}
+    it {should have_many :coupons}
   end
 
   describe 'instance methods' do
@@ -66,6 +66,28 @@ RSpec.describe User, type: :model do
       create(:order_item, order: @order_5, item: @item_6, unit_price: 2, quantity: 1, fulfilled: true)
       create(:order_item, order: @order_2, item: @item_4, unit_price: 2, quantity: 1, fulfilled: true)
     end
+
+    describe '.coupon_count' do
+      it 'returns the count of coupons in the system for a merchant' do
+        expect(@merchant.coupon_count).to eq(0)
+        create_list(:coupon, 3, user: @merchant)
+        expect(@merchant.coupon_count).to eq(3)
+      end
+    end
+
+    describe '.redeemed_coupon?' do
+      it 'returns a boolean indicating if a user has redeemed a coupon' do
+        user = create(:user)
+        coupon = create(:coupon, user: @merchant)
+
+        expect(user.redeemed_coupon?(coupon)).to eq(false)
+
+        create(:order, coupon: coupon, user: user)
+
+        expect(user.redeemed_coupon?(coupon)).to eq(true)
+      end
+    end
+
     describe '.top_items_for_merchant(limit)' do
       it 'returns an array of the top # items sold by quantity and the quantity of each sold for a specific merchant' do
         expect(@merchant.top_items_for_merchant(5)).to eq([@item_6, @item_4, @item_3, @item_2, @item_1])
@@ -88,6 +110,12 @@ RSpec.describe User, type: :model do
         @item_1.update(quantity: 9)
 
         expect(@merchant.items_sold_by_percentage).to eq(0.25)
+      end
+    end
+
+    describe '.current_inventory' do
+      it 'returns the current total stock for a merchant' do
+        expect(@merchant.current_inventory).to eq(60)
       end
     end
 
@@ -123,6 +151,40 @@ RSpec.describe User, type: :model do
       it 'returns the top 3 users who have spent the most money on a specific merchant\'s items, along with the total amount spent by each' do
         expect(@merchant.top_spenders(3).first.name).to eq(@user_1.name)
         expect(@merchant.top_spenders(3).first.total_spent).to eq(100)
+      end
+    end
+
+    describe '.revenue_by_month(limit)' do
+      it 'Returns the revenue for the past (limit) number of months' do
+        new_merchant = create(:merchant)
+        new_item = create(:item, user: new_merchant)
+        january = create(:order_item, quantity: 2, item: new_item, fulfilled: true, created_at: 1.month.ago)
+        january = create(:order_item, quantity: 6, item: new_item, fulfilled: false, created_at: 1.month.ago)
+        december = create(:order_item, quantity: 3, item: new_item, fulfilled: true, created_at: 2.months.ago)
+        november = create(:order_item, quantity: 4, item: new_item, fulfilled: true, created_at: 3.months.ago)
+        october = create(:order_item, quantity: 4, item: new_item, fulfilled: true, created_at: 4.months.ago)
+        september = create(:order_item, quantity: 2, item: new_item, fulfilled: true, created_at: 5.months.ago)
+        august = create(:order_item, quantity: 1, item: new_item, fulfilled: true, created_at: 6.months.ago)
+        july = create(:order_item, quantity: 8, item: new_item, fulfilled: true, created_at: 7.months.ago)
+        july_older = create(:order_item, quantity: 4, item: new_item, fulfilled: true, created_at: 19.months.ago)
+        result = new_merchant.revenue_by_month(6)
+
+        expect(result.length).to eq(5)
+        expect(result[0].revenue).to eq(2 * new_item.price)
+        expect(result[0].month).to eq(1)
+        expect(result[0].year).to eq(2019)
+        expect(result[1].revenue).to eq(3 * new_item.price)
+        expect(result[1].month).to eq(12)
+        expect(result[1].year).to eq(2018)
+        expect(result[2].revenue).to eq(4 * new_item.price)
+        expect(result[2].month).to eq(11)
+        expect(result[2].year).to eq(2018)
+        expect(result[3].revenue).to eq(4 * new_item.price)
+        expect(result[3].month).to eq(10)
+        expect(result[3].year).to eq(2018)
+        expect(result[4].revenue).to eq(2 * new_item.price)
+        expect(result[4].month).to eq(9)
+        expect(result[4].year).to eq(2018)
       end
     end
   end
@@ -231,5 +293,15 @@ RSpec.describe User, type: :model do
       end
     end
 
+    describe 'total_sales_by_merchant' do
+      it "returns merchants who have been part of completed orders by total revenue" do
+        actual = User.total_sales_by_merchant
+        expect(actual).to eq ([@merchant_1, @merchant_3, @merchant_2, @merchant_4])
+        expect(actual[0].revenue).to eq(500)
+        expect(actual[1].revenue).to eq(100)
+        expect(actual[2].revenue).to eq(30)
+        expect(actual[3].revenue).to eq(30)
+      end
+    end
   end
 end

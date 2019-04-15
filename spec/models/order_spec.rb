@@ -9,6 +9,7 @@ RSpec.describe Order, type: :model do
     it {should belong_to :user}
     it {should have_many :order_items}
     it {should have_many :items}
+    it {should belong_to(:coupon).required(false)}
   end
 
   describe 'instance methods' do

@@ -63,4 +63,58 @@ RSpec.describe Cart do
       expect(cart.total).to eq(0)
     end
   end
+
+  describe '.discounted_total' do
+    before :each do
+      @merchant = create(:merchant)
+      @other_merchant = create(:merchant)
+      @dollar_coupon = create(:coupon, value: 10, user: @merchant)
+      @percentage_coupon = create(:percentage_coupon, value: 50, user: @merchant)
+      @cart = Cart.new(nil)
+      @item_1 = create(:item, price: 5.0, user: @merchant)
+      @item_2 = create(:item, price: 10.0, user: @merchant)
+      @item_3 = create(:item, price: 20.0, user: @other_merchant)
+    end
+
+    it 'returns a discounted total for a dollar based coupon' do
+      @cart.add_item(@item_1.id.to_s)
+
+      expect(@cart.discounted_total(@dollar_coupon)).to eq(0.0)
+
+      @cart.add_item(@item_2.id.to_s)
+
+      expect(@cart.discounted_total(@dollar_coupon)).to eq(@item_1.price + @item_2.price - @dollar_coupon.value)
+    end
+
+    it 'percentage coupons of value over 100 result in a zero return value' do
+      @percentage_coupon.update(value: 100.1)
+      @cart.add_item(@item_1.id.to_s)
+
+      expect(@cart.discounted_total(@percentage_coupon)).to eq(0.0)
+    end
+
+    it 'returns a discounted total for a percentage based coupon' do
+      @cart.add_item(@item_1.id.to_s)
+
+      expect(@cart.discounted_total(@percentage_coupon)).to eq(@item_1.price * (100 - @percentage_coupon.value) / 100)
+
+      @cart.add_item(@item_2.id.to_s)
+
+      expect(@cart.discounted_total(@percentage_coupon)).to eq((@item_1.price + @item_2.price) * (100 - @percentage_coupon.value) / 100)
+    end
+
+    it 'Only impacts items sold by the issuing merchant' do
+      @cart.add_item(@item_1.id.to_s)
+      @cart.add_item(@item_3.id.to_s)
+
+      expect(@cart.discounted_total(@dollar_coupon)).to eq(20.0)
+
+      @cart.contents.clear
+
+      @cart.add_item(@item_1.id.to_s)
+      @cart.add_item(@item_3.id.to_s)
+
+      expect(@cart.discounted_total(@percentage_coupon)).to eq((@item_1.price * @percentage_coupon.value / 100) + @item_3.price)
+    end
+  end
 end

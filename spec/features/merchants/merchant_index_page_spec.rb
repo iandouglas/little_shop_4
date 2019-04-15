@@ -68,11 +68,7 @@ RSpec.describe 'when I visit the merchant index page' do
 
     create(:order_item, order: @order_3, item: @item_4, unit_price: 5, quantity: 20, fulfilled: true, created_at: 4.seconds.ago, updated_at: 1.second.ago)
     create(:order_item, order: @order_3, item: @item_5, unit_price: 3, quantity: 10, fulfilled: true, created_at: 30.seconds.ago, updated_at: 29.seconds.ago)
-
-
-    end
-
-
+  end
 
   context 'as a visitor' do
     it "I see a list of all merchants in the system" do
@@ -117,11 +113,36 @@ RSpec.describe 'when I visit the merchant index page' do
   end
 
   context 'in the statistics part of the page' do
+    it 'I see a pie chart of all merchants who have completed orders and their revenue' do
+      visit merchants_path
+      within '#statistics' do
+        within '#merchants-by-revenue' do
+          expect(page).to have_css('#merchants-by-revenue-chart')
+          within "#merchant-#{@merchant_1.id}" do
+            expect(page).to have_content(number_to_currency(500))
+          end
+
+          within "#merchant-#{@merchant_3.id}" do
+            expect(page).to have_content(number_to_currency(100))
+          end
+
+          within "#merchant-#{@merchant_2.id}" do
+            expect(page).to have_content(number_to_currency(30))
+          end
+
+          within "#merchant-#{@merchant_4.id}" do
+            expect(page).to have_content(number_to_currency(30))
+          end
+        end
+      end
+    end
+
     it "I see the top 3 merchants by revenue and their revenue" do
       visit merchants_path
 
       within '#statistics' do
         within '#biggest-merchants' do
+          expect(page).to have_css('#biggest-merchants-chart')
           biggest_merchants = page.find_all(".list-group-item")
           expect(page).to have_content("Top 3 Merchants by revenue")
           expect(biggest_merchants[0]).to have_content("#{@merchant_1.name}. Revenue: $500")
@@ -228,6 +249,7 @@ RSpec.describe 'when I visit the merchant index page' do
 
       within '#statistics' do
         within '#top-states' do
+          expect(page).to have_css('#top-states-chart')
           top_states = page.find_all(".list-group-item")
           expect(top_states[0]).to have_content("Wisconsin. Number of orders: 5")
           expect(top_states[1]).to have_content("California. Number of orders: 4")
@@ -257,6 +279,7 @@ RSpec.describe 'when I visit the merchant index page' do
 
       within '#statistics' do
         within '#top-cities' do
+          expect(page).to have_css('#top-cities-chart')
           top_cities = page.find_all(".list-group-item")
           expect(top_cities[0]).to have_content("Los Angeles, California. Number of orders: 5")
           expect(top_cities[1]).to have_content("Green Bay, Wisconsin. Number of orders: 4")
@@ -284,6 +307,7 @@ RSpec.describe 'when I visit the merchant index page' do
 
       within '#statistics' do
         within '#biggest-orders' do
+          expect(page).to have_css('#biggest-orders-chart')
           biggest_orders = page.find_all(".list-group-item")
           expect(biggest_orders[0]).to have_content("Order: #{order_1.id} Quantity: 10")
           expect(biggest_orders[1]).to have_content("Order: #{order_2.id} Quantity: 8")

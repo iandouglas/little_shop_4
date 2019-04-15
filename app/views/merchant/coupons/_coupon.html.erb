@@ -1,0 +1,20 @@
+<div class="form-group">
+  <%= f.label :name %>
+  <%= f.text_field :name, class: 'form-control' %>
+</div>
+
+<div class="form-group">
+  <%= f.label :value %>
+  <%= f.number_field :value, step: 0.01, class: 'form-control' %>
+</div>
+
+<div class="form-group">
+  <%= f.label :percent, "Discount type:" %>
+  <% if f.object.percent %>
+    <%= f.select :percent, options_for_select(['Percent', 'Dollars'], 'Percent'), {}, class: 'form-control' %>
+  <% else %>
+    <%= f.select :percent, options_for_select(['Percent', 'Dollars'], 'Dollars'), {}, class: 'form-control' %>
+  <% end %>
+</div>
+
+<%= f.submit 'Submit', class: 'btn btn-primary' %>

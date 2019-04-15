@@ -1,0 +1,35 @@
+<section class="container">
+  <section class="row">
+    <div class="card col-12 col-md-8 offset-md-2">
+      <div class="card-body">
+        <h1 class="card-title"><%= @coupon.name %></h1>
+        <h5 class="card-body">Value: <%= number_to_currency(@coupon.value) unless @coupon.percent %>
+        <%= number_to_percentage(@coupon.value, strip_insignificant_zeros: true) if @coupon.percent %></h5>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Created: <%= @coupon.created_at.strftime("%B, %d %Y at %I:%M %p %Z") %></li>
+          <li class="list-group-item">Last Updated: <%= @coupon.updated_at.strftime("%B, %d %Y at %I:%M %p %Z") %></li>
+          <li class="list-group-item">Current Status: <%= "Active" unless @coupon.disabled %>
+          <%= "Disabled" if @coupon.disabled %></li>
+        </ul>
+        <br/>
+        <div class="row ml-auto">
+          <div class="col-4">
+            <% if @coupon.disabled %>
+            <%= button_to 'Enable Coupon', dashboard_enable_coupon_path(@coupon), method: :put, class: 'btn btn-success' %>
+            <% else %>
+            <%= button_to 'Disable Coupon', dashboard_disable_coupon_path(@coupon), method: :put, class: 'btn btn-warning' %>
+            <% end %>
+          </div>
+          <% if @coupon.unused? %>
+          <div class="col-4">
+            <%= button_to 'Delete Coupon', dashboard_coupon_path(@coupon), method: :delete, class: 'btn btn-danger' %>
+          </div>
+          <div class="col-4">
+            <%= link_to 'Edit Coupon', edit_dashboard_coupon_path(@coupon), class: 'btn btn-primary' %>
+          </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
